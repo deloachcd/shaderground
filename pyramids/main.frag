@@ -27,11 +27,17 @@ void main() {
 
     float box_radius = 0.05;
     float alpha = 1.0;
+    float tolerance = 0.00001;
 
     vec2 coord = gl_FragCoord.xy/u_resolution;
     for (int i = 0; i < 3; i++) {
         if (point_in_box(coord, apl[i], box_radius)) {
-            alpha = 0.3;
+            // alpha rises and falls smoothly relative to u_time
+            if (mod(floor(u_time), 2.0) == 0.0) {
+                alpha = 1.0 - mod(u_time, 1.0);
+            } else {
+                alpha = mod(u_time, 1.0);
+            }
         }
     }
     gl_FragColor = vec4(alpha, alpha, alpha, 1.0);
