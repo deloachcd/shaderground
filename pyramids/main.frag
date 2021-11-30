@@ -32,11 +32,14 @@ void main() {
     vec2 coord = gl_FragCoord.xy/u_resolution;
     for (int i = 0; i < 3; i++) {
         if (point_in_box(coord, apl[i], box_radius)) {
+            // apl[i].x controls interval via shifted_time
+            float shifted_time = u_time * apl[i].x;
+
             // alpha rises and falls smoothly relative to u_time
-            if (mod(floor(u_time), 2.0) == 0.0) {
-                alpha = 1.0 - mod(u_time, 1.0);
+            if (mod(floor(shifted_time), 2.0) == 0.0) {
+                alpha = 1.0 - mod(shifted_time, 1.0);
             } else {
-                alpha = mod(u_time, 1.0);
+                alpha = mod(shifted_time, 1.0);
             }
         }
     }
