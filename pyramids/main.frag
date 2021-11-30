@@ -8,23 +8,31 @@ uniform float u_time;
 bool point_in_box(vec2 point, vec2 center, float hypolen) {
     float box_magnitude = hypolen / sqrt(1.0/2.0);
 
-    return (center.x + box_magnitude < point.x
-            || center.x - box_magnitude > point.x
-            || center.y + box_magnitude < point.y
-            || center.y - box_magnitude > point.y);
+    // wacky ass way to do this, but it works
+    return !(center.x + box_magnitude < point.x
+             || center.x - box_magnitude > point.x
+             || center.y + box_magnitude < point.y
+             || center.y - box_magnitude > point.y);
 }
 
 void main() {
-    vec2 ap1 = vec2(  0.6,  0.4);
-    vec2 ap2 = vec2(-0.25,  0.1);
-    vec2 ap3 = vec2(  0.4, -0.6);
-    float alpha;
+    vec2 ap1 = vec2(0.15, 0.4);
+    vec2 ap2 = vec2(0.45, 0.1);
+    vec2 ap3 = vec2(0.8, 0.75);
+
+    vec2 apl[3];
+    apl[0] = ap1;
+    apl[1] = ap2;
+    apl[2] = ap3;
+
+    float box_radius = 0.05;
+    float alpha = 1.0;
 
     vec2 coord = gl_FragCoord.xy/u_resolution;
-    if (point_in_box(coord, ap1, 0.1)) {
-        alpha = 1.0;
-    } else {
-        alpha = 0.0;
+    for (int i = 0; i < 3; i++) {
+        if (point_in_box(coord, apl[i], box_radius)) {
+            alpha = 0.3;
+        }
     }
     gl_FragColor = vec4(alpha, alpha, alpha, 1.0);
 }
