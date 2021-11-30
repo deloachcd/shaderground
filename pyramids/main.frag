@@ -8,11 +8,11 @@ uniform float u_time;
 bool point_in_box(vec2 point, vec2 center, float hypolen) {
     float box_magnitude = hypolen / sqrt(1.0/2.0);
 
-    // wacky ass way to do this, but it works
-    return !(center.x + box_magnitude < point.x
-             || center.x - box_magnitude > point.x
-             || center.y + box_magnitude < point.y
-             || center.y - box_magnitude > point.y);
+    // it took me way too long to do this correctly...
+    return (center.x + box_magnitude >= point.x
+            && center.x - box_magnitude <= point.x
+            && center.y + box_magnitude >= point.y
+            && center.y - box_magnitude <= point.y);
 }
 
 void main() {
