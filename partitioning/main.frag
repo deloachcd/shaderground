@@ -20,7 +20,7 @@ bool values_match(float v1, float v2, float tolerance) {
 void main() {
     // constants for generating grid
     const float MAX_LEN = 0.1;
-    const float MIN_LEN = 0.095;
+    const float MIN_LEN = 0.08;
     const int N_COLS = 5;
 
     // 2D prototype
@@ -32,8 +32,14 @@ void main() {
     float COL_WIDTH = 1.0/float(N_COLS);
     float horizontal_offset = (mod(floor(coord.y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
     float r = 0.0;
+    // draw verticals
     if (values_match((floor((coord.x+ADJUST)/COL_WIDTH)*COL_WIDTH) + horizontal_offset,
                      coord.x, TOLERANCE)) {
+        r = 1.0;
+    }
+    // draw horizontals
+    if (values_match((floor((coord.y+ADJUST)/MAX_LEN)*MAX_LEN),
+                     coord.y, TOLERANCE)) {
         r = 1.0;
     }
 
