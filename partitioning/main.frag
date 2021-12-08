@@ -44,9 +44,9 @@ void main() {
     float COL_WIDTH = 1.0/float(N_COLS);
 
     // sector corresponds to number of rows/columns in
-    int h_sector = int(floor((coord.x+ADJUST)/COL_WIDTH));
-    int v_sector = int(floor((coord.y+ADJUST)/MAX_LEN));
     float h_offset = (mod(floor(coord.y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
+    int h_sector = int(floor(((coord.x+h_offset)+ADJUST)/COL_WIDTH));
+    int v_sector = int(floor((coord.y+ADJUST)/MAX_LEN));
 
     float alpha = 0.0;
     float r = 0.0;
@@ -100,15 +100,22 @@ void main() {
             }
         }
     }
-    // int h_sector = int(floor((coord.x+ADJUST)/COL_WIDTH));
-    // int v_sector = int(floor((coord.y+ADJUST)/MAX_LEN));
-    if (vectors_match(coord, corners[arr2d_index(h_sector, v_sector, N_ROWS+1)],
-                      TOLERANCE*10)) {
-        b = 1.0;
+    //int h_sector = int(floor((coord.x+ADJUST)/COL_WIDTH));
+    //int v_sector = int(floor((coord.y+ADJUST)/MAX_LEN));
+    if (int(mod(h_sector, 2.0)) == 0) {
+        b += 0.5;
     }
+    if (int(mod(v_sector, 2.0)) == 0) {
+        b += 0.5;
+    }
+    //if (vectors_match(coord, corners[arr2d_index(h_sector, 1, N_ROWS+1)],
+    //                  TOLERANCE*100)) {
+    //    b = 1.0;
+    //}
 
     r = rand(coord);
 
-    gl_FragColor = vec4(r, g, b, 1.0);
+    //gl_FragColor = vec4(coord.x, 0.0, coord.y, 1.0);
+    gl_FragColor = vec4(r, 0.0, b, 1.0);
     //gl_FragColor = vec4(r, g, b, alpha);
 }
