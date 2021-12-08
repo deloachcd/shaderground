@@ -8,8 +8,9 @@ uniform vec4 u_date;
 uniform sampler2D u_tex0;
 uniform vec2 u_tex0Resolution;
 
-float rand(vec2 co){
-    //
+float rand(vec2 co) {
+    // generate a random value based on the seconds in the day that have
+    // passed when loading the shader
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * (u_date.w - u_time));
 }
 
@@ -20,7 +21,6 @@ bool values_match(float v1, float v2, float tolerance) {
 void main() {
     vec2 coord = gl_FragCoord.xy/u_resolution;
     vec4 texRGB = texture2D(u_tex0, coord);
-    //coord = vec2(coord.x*scale_factor, coord.y*scale_factor);
     float tolerance = 0.001;
 
     float r = rand(coord);

@@ -22,11 +22,18 @@ bool vectors_match(vec2 v1, vec2 v2, float tolerance) {
                 v1.y < v2.y + tolerance && v1.y > v2.y - tolerance;
 }
 
+int arr2d_index(int row, int col, int colsize) {
+    return (colsize * row) + col;
+}
+
 void main() {
     // constants for generating grid
     const float MAX_LEN = 0.1;
     const float MIN_LEN = 0.08;
     const int N_COLS = 5;
+
+    int N_ROWS = int(floor(1.0/MAX_LEN));
+    vec2 corners[66]; // N_ROWS+1 * N_COLS+1 -- must be updated if these change!
 
     // 2D prototype
     vec2 coord = gl_FragCoord.xy/u_resolution;
@@ -37,54 +44,71 @@ void main() {
     float COL_WIDTH = 1.0/float(N_COLS);
 
     // sector corresponds to number of rows/columns in
-    int horizontal_sector = int(floor((coord.x+ADJUST)/COL_WIDTH));
-    int vertical_sector = int(floor((coord.y+ADJUST)/MAX_LEN));
-    float horizontal_offset = (mod(floor(coord.y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
+    int h_sector = int(floor((coord.x+ADJUST)/COL_WIDTH));
+    int v_sector = int(floor((coord.y+ADJUST)/MAX_LEN));
+    float h_offset = (mod(floor(coord.y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
 
     float alpha = 0.0;
     float r = 0.0;
     float g = 0.0;
+    float b = 0.0;
     // draw verticals
-    if (values_match((horizontal_sector*COL_WIDTH) + horizontal_offset,
+    if (values_match((h_sector*COL_WIDTH) + h_offset,
                      coord.x, TOLERANCE)) {
         alpha = 1.0;
     }
     // draw horizontals
-    if (values_match(vertical_sector*MAX_LEN, coord.y, TOLERANCE)) {
+    if (values_match(v_sector*MAX_LEN, coord.y, TOLERANCE)) {
         alpha = 1.0;
     }
     // draw verticals
-    if ((values_match((floor((coord.x+ADJUST)/COL_WIDTH)*COL_WIDTH) + horizontal_offset,
+    if ((values_match((floor((coord.x+ADJUST)/COL_WIDTH)*COL_WIDTH) + h_offset,
                       coord.x, TOLERANCE) &&
          values_match((floor((coord.y+ADJUST)/MAX_LEN)*MAX_LEN),
                       coord.y, TOLERANCE))) {
         g = 0.0;
     }
 
-    int N_ROWS = int(floor(1.0/MAX_LEN));
     float placeholder;
-    int i, j;
+    int i, j, k;
     float x, y;
+    float y_offset;
     for (i=0; i<=N_ROWS; i++) {
         y = float(i) * MAX_LEN;
-        if (horizontal_offset != 0.0) {
+        y_offset = (mod(floor(y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
+        // array writing
+        if (y_offset != 0.0) {
+            //corners[arr2d_index(i, 0, N_ROWS+1)] = vec2(0.0, y);
+            //corners[arr2d_index(i, N_COLS, N_ROWS+1)] = vec2(1.0, y);
+        }
+        // highlighting
+        if (h_offset != 0.0) {
+            // float corners[];
+            // arr2d_index(int row, int col, int colsize)
             if (vectors_match(coord, vec2(0.0, y), TOLERANCE*10)) {
                 g = 1.0;
-            }
-            if (vectors_match(coord, vec2(1.0, y), TOLERANCE*10)) {
+            } else if (vectors_match(coord, vec2(1.0, y), TOLERANCE*10)) {
                 g = 1.0;
             }
         }
         for (j=0; j<=N_COLS; j++) {
-            x = (j*COL_WIDTH) + horizontal_offset;
+            x = (j*COL_WIDTH) + h_offset;
+            // write anchor point
+            corners[arr2d_index(i, j, N_ROWS+1)] = vec2(x, y);
             if (vectors_match(coord, vec2(x, y), TOLERANCE*10)) {
                 g = 1.0;
             }
         }
     }
+    // int h_sector = int(floor((coord.x+ADJUST)/COL_WIDTH));
+    // int v_sector = int(floor((coord.y+ADJUST)/MAX_LEN));
+    if (vectors_match(coord, corners[arr2d_index(h_sector, v_sector, N_ROWS+1)],
+                      TOLERANCE*10)) {
+        b = 1.0;
+    }
 
     r = rand(coord);
 
-    //gl_FragColor = vec4(r, g, 0.0, 1.0);
-    gl_FragColor = vec4(r, g, 0.0, alpha);
+    gl_FragColor = vec4(r, g, b, 1.0);
+    //gl_FragColor = vec4(r, g, b, alpha);
 }
