@@ -65,16 +65,30 @@ void main() {
     float placeholder;
     int i, j, k;
     float x, y;
-    float y_offset;
-    for (i=0; i<=0; i++) { // row by row strategy
+    float pt_offset;
+    float x_adj, y_adj;
+    for (i=0; i<=N_ROWS; i++) { // row by row strategy
         // = 0
         y = float(i) * MAX_LEN;
         // = 0
-        y_offset = (mod(floor(y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
+        pt_offset = (mod(floor(y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
         for (j=0; j<=N_COLS; j++) {
-            // offset does not matter for this row
-            x = (j*COL_WIDTH) + y_offset;
-            corners[arr2d_index(j, i, N_ROWS+1)] = vec2(x, y);
+            x = (j*COL_WIDTH) + pt_offset;
+            x_adj = COL_WIDTH/2.0;
+            y_adj = MAX_LEN/2.0;
+            if (pt_offset == 0.0) {
+                corners[arr2d_index(j, i, N_ROWS+1)] = vec2(x + x_adj, y + y_adj);
+            } else {
+                if (j == 0) {
+                    x_adj = COL_WIDTH/4.0;
+                } else if (j == N_COLS) {
+                    x_adj = (3.0/4.0)*COL_WIDTH;
+                } else {
+                    x_adj = COL_WIDTH/2.0;
+                }
+                y_adj = MAX_LEN/2.0;
+                corners[arr2d_index(j, i, N_ROWS+1)] = vec2(x - x_adj, y + y_adj);
+            }
         }
     }
     //int h_sector = int(floor((coord.x+ADJUST)/COL_WIDTH));
