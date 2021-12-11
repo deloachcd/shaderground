@@ -105,20 +105,37 @@ void main() {
     }
     float sector_x = mod(coord.x, COL_WIDTH);
     float sector_y = mod(coord.y, ROW_HEIGHT);
+    float diagonal = ROW_HEIGHT/(2*COL_WIDTH);
+    float sector_sign;
     if (sector_y < ROW_HEIGHT/4) {
         if (sector_x < COL_WIDTH/2) {
-            g = 0.5;
+            if (sector_y < diagonal*sector_x) {
+                g = 0.5;
+            }
         } else {
-            g = 0.25;
+            float adjusted_x = (sector_x-(COL_WIDTH/2));
+            if (sector_y < (diagonal*adjusted_x*-1)+(ROW_HEIGHT/4)) {
+                g = 0.5;
+            }
         }
     } else if ((sector_y > ROW_HEIGHT/4) && sector_y < 3*ROW_HEIGHT/4) {
-        g = 0.75;
+        //g = 0.75;
     } else {
         if (sector_x < COL_WIDTH/2) {
+            if (sector_y > (diagonal*sector_x*-1) + ROW_HEIGHT) {
+                g = 0.5;
+            }
+        } else {
+            float adjusted_x = (sector_x-(COL_WIDTH/2));
+            if (sector_y > (diagonal*adjusted_x)+(3*ROW_HEIGHT/4)) {
+                g = 0.5;
+            }
+        }
+        /*if (sector_x < COL_WIDTH/2) {
             g = 0.25;
         } else {
             g = 0.5;
-        }
+        }*/
     }
 
     r = rand(coord);
