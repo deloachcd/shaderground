@@ -62,34 +62,6 @@ void main() {
         alpha = 1.0;
     }
 
-    float placeholder;
-    int i, j, k;
-    float x, y;
-    float pt_offset;
-    float x_adj, y_adj;
-    for (i=0; i<=N_ROWS; i++) {
-        y = float(i) * ROW_HEIGHT;
-        pt_offset = (mod(floor(y*ROW_HEIGHT*100),2)/2.0)*COL_WIDTH;
-        for (j=0; j<=N_COLS; j++) {
-            x = (j*COL_WIDTH) + pt_offset;
-            x_adj = COL_WIDTH/2.0;
-            y_adj = ROW_HEIGHT/2.0;
-            if (pt_offset == 0.0) {
-                anchors[arr2d_index(j, i, N_ROWS+1)] = vec2(x + x_adj, y + y_adj);
-            } else {
-                if (j == 0) {
-                    x_adj = COL_WIDTH/4.0;
-                } else if (j == N_COLS) {
-                    x_adj = (3.0/4.0)*COL_WIDTH;
-                } else {
-                    x_adj = COL_WIDTH/2.0;
-                }
-                y_adj = ROW_HEIGHT/2.0;
-                anchors[arr2d_index(j, i, N_ROWS+1)] = vec2(x - x_adj, y + y_adj);
-            }
-        }
-    }
-
     // sector marking
     if (int(mod(h_sector, 2.0)) == 0) {
         b += 0.5;
@@ -99,7 +71,7 @@ void main() {
     }
 
     // green channel highlighting
-    vec2 anchor = anchors[arr2d_index(h_sector, v_sector, N_ROWS+1)]; // center of sector
+    //vec2 anchor = anchors[arr2d_index(h_sector, v_sector, N_ROWS+1)]; // center of sector
     float pyramid_width;
     float pyramid_height;
     float center_shift;
@@ -119,10 +91,10 @@ void main() {
         }
     }
 
-    vec2 _anchor = vec2((h_sector*COL_WIDTH)+(pyramid_width/2)-center_shift,
+    vec2 anchor = vec2((h_sector*COL_WIDTH)+(pyramid_width/2)-center_shift,
                         v_sector*ROW_HEIGHT + ROW_HEIGHT/2);
 
-    if (vectors_match(coord, _anchor, TOLERANCE*5)) {
+    if (vectors_match(coord, anchor, TOLERANCE*5)) {
         r = 1.0;
     }
 
