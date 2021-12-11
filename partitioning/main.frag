@@ -5,7 +5,118 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec4 u_date;
+/*
+float get_pixel_height (float pyramid_height, float pyramid_width,
+                        vec2 coord) {
+    float diagonal = pyramid_height/(2*pyramid_width);
+    float sector_x = mod(coord.x, pyramid_width);
+    float sector_y = mod(coord.y, pyramid_height);
+    // bottom fourth
+    if (sector_y < ROW_HEIGHT/4) {
+        // left side
+        if (sector_x < COL_WIDTH/2) {
+            if (sector_y < diagonal*sector_x) {
+                g = sector_y / (ROW_HEIGHT/4);
+            } else {
+                g = sector_x / (COL_WIDTH/2);
+            }
+        // right side
+        } else {
+            float adjusted_x = (sector_x-(COL_WIDTH/2));
+            if (sector_y < (diagonal*adjusted_x*-1)+(ROW_HEIGHT/4)) {
+                g = sector_y / (ROW_HEIGHT/4);
+            } else {
+                g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
+            }
+        }
+    // middle section
+    } else if ((sector_y > ROW_HEIGHT/4) && sector_y < 3*ROW_HEIGHT/4) {
+        //g = 0.75;
+        if (sector_x < COL_WIDTH/2) {
+            g = sector_x / (COL_WIDTH/2);
+        } else {
+            float adjusted_x = (sector_x-(COL_WIDTH/2));
+            g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
+        }
+    // top fourth
+    } else {
+        // left side
+        if (sector_x < COL_WIDTH/2) {
+            if (sector_y > (diagonal*sector_x*-1) + ROW_HEIGHT) {
+                float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
+                g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
+            } else {
+                g = sector_x / (COL_WIDTH/2);
+            }
+        // right side
+        } else {
+            float adjusted_x = (sector_x-(COL_WIDTH/2));
+            if (sector_y > (diagonal*adjusted_x)+(3*ROW_HEIGHT/4)) {
+                float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
+                g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
+            } else {
+                g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
+            }
+        }
+    }
+*/
 
+float get_pixel_height (float pyramid_height, float pyramid_width, vec2 coord) {
+    float diagonal = pyramid_height/(2*pyramid_width);
+    float sector_x = mod(coord.x, pyramid_width);
+    float sector_y = mod(coord.y, pyramid_height);
+    float height = 0.0;
+
+    // bottom fourth
+    if (sector_y < pyramid_height/4) {
+        // left side
+        if (sector_x < pyramid_width/2) {
+            if (sector_y < diagonal*sector_x) {
+                height = sector_y / (pyramid_height/4);
+            } else {
+                height = sector_x / (pyramid_width/2);
+            }
+        // right side
+        } else {
+            float adjusted_x = (sector_x-(pyramid_width/2));
+            if (sector_y < (diagonal*adjusted_x*-1)+(pyramid_height/4)) {
+                height = sector_y / (pyramid_height/4);
+            } else {
+                height = ((adjusted_x*-1)/(pyramid_width/2)) + 1.0;
+            }
+        }
+    // middle section
+    } else if ((sector_y > pyramid_height/4) && sector_y < 3*pyramid_height/4) {
+        //height = 0.75;
+        if (sector_x < pyramid_width/2) {
+            height = sector_x / (pyramid_width/2);
+        } else {
+            float adjusted_x = (sector_x-(pyramid_width/2));
+            height = ((adjusted_x*-1)/(pyramid_width/2)) + 1.0;
+        }
+    // top fourth
+    } else {
+        // left side
+        if (sector_x < pyramid_width/2) {
+            if (sector_y > (diagonal*sector_x*-1) + pyramid_height) {
+                float adjusted_y = (sector_y-(3*pyramid_height/4));
+                height = ((adjusted_y*-1)/(pyramid_height/4)) + 1.0;
+            } else {
+                height = sector_x / (pyramid_width/2);
+            }
+        // right side
+        } else {
+            float adjusted_x = (sector_x-(pyramid_width/2));
+            if (sector_y > (diagonal*adjusted_x)+(3*pyramid_height/4)) {
+                float adjusted_y = (sector_y-(3*pyramid_height/4));
+                height = ((adjusted_y*-1)/(pyramid_height/4)) + 1.0;
+            } else {
+                height = ((adjusted_x*-1)/(pyramid_width/2)) + 1.0;
+            }
+        }
+    }
+    return height;
+}
 
 float rand(vec2 co) {
     // generate a random value based on the seconds in the day that have
@@ -70,10 +181,8 @@ void main() {
         b += 0.5;
     }
 
-    // green channel highlighting
-    //vec2 anchor = anchors[arr2d_index(h_sector, v_sector, N_ROWS+1)]; // center of sector
+    // procedurally get anchor point
     float pyramid_width;
-    float pyramid_height;
     float center_shift;
     if (h_offset != 0.0 && (h_sector == 0 || h_sector == N_COLS) ) {
         pyramid_width = COL_WIDTH/2;
@@ -103,55 +212,10 @@ void main() {
     float diagonal = ROW_HEIGHT/(2*COL_WIDTH);
     float sector_sign;
     float height;
-    if (h_offset == 0.0) {
-        // bottom fourth
-        if (sector_y < ROW_HEIGHT/4) {
-            // left side
-            if (sector_x < COL_WIDTH/2) {
-                if (sector_y < diagonal*sector_x) {
-                    g = sector_y / (ROW_HEIGHT/4);
-                } else {
-                    g = sector_x / (COL_WIDTH/2);
-                }
-            // right side
-            } else {
-                float adjusted_x = (sector_x-(COL_WIDTH/2));
-                if (sector_y < (diagonal*adjusted_x*-1)+(ROW_HEIGHT/4)) {
-                    g = sector_y / (ROW_HEIGHT/4);
-                } else {
-                    g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
-                }
-            }
-        // middle section
-        } else if ((sector_y > ROW_HEIGHT/4) && sector_y < 3*ROW_HEIGHT/4) {
-            //g = 0.75;
-            if (sector_x < COL_WIDTH/2) {
-                g = sector_x / (COL_WIDTH/2);
-            } else {
-                float adjusted_x = (sector_x-(COL_WIDTH/2));
-                g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
-            }
-        // top fourth
-        } else {
-            // left side
-            if (sector_x < COL_WIDTH/2) {
-                if (sector_y > (diagonal*sector_x*-1) + ROW_HEIGHT) {
-                    float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
-                    g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
-                } else {
-                    g = sector_x / (COL_WIDTH/2);
-                }
-            // right side
-            } else {
-                float adjusted_x = (sector_x-(COL_WIDTH/2));
-                if (sector_y > (diagonal*adjusted_x)+(3*ROW_HEIGHT/4)) {
-                    float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
-                    g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
-                } else {
-                    g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
-                }
-            }
-        }
+    if (h_offset == 0.0 || h_sector == 0 || h_sector == N_COLS) {
+        g = get_pixel_height(ROW_HEIGHT, pyramid_width, coord);
+    } else {
+        g = get_pixel_height(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y));
     }
     //r = rand(coord);
 
