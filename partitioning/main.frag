@@ -99,67 +99,91 @@ void main() {
     }
 
     // green channel highlighting
-    //vec2 anchor = anchors[arr2d_index(h_sector, v_sector, N_ROWS+1)]; // center of sector
-    //if (vectors_match(coord, anchor, TOLERANCE*5)) {
-    //    g = 1.0;
-    //}
+    vec2 anchor = anchors[arr2d_index(h_sector, v_sector, N_ROWS+1)]; // center of sector
+    float pyramid_width;
+    float pyramid_height;
+    float center_shift;
+    if (h_offset != 0.0 && (h_sector == 0 || h_sector == N_COLS) ) {
+        pyramid_width = COL_WIDTH/2;
+        if (h_sector == 0) {
+            center_shift = 0.0;
+        } else {
+            center_shift = h_offset;
+        }
+    } else {
+        pyramid_width = COL_WIDTH;
+        if (h_offset == 0.0) {
+            center_shift = 0.0;
+        } else {
+            center_shift = h_offset;
+        }
+    }
+
+    vec2 _anchor = vec2((h_sector*COL_WIDTH)+(pyramid_width/2)-center_shift,
+                        v_sector*ROW_HEIGHT + ROW_HEIGHT/2);
+
+    if (vectors_match(coord, _anchor, TOLERANCE*5)) {
+        r = 1.0;
+    }
+
     float sector_x = mod(coord.x, COL_WIDTH);
     float sector_y = mod(coord.y, ROW_HEIGHT);
     float diagonal = ROW_HEIGHT/(2*COL_WIDTH);
     float sector_sign;
     float height;
-    // bottom fourth
-    if (sector_y < ROW_HEIGHT/4) {
-        // left side
-        if (sector_x < COL_WIDTH/2) {
-            if (sector_y < diagonal*sector_x) {
-                g = sector_y / (ROW_HEIGHT/4);
+    if (h_offset == 0.0) {
+        // bottom fourth
+        if (sector_y < ROW_HEIGHT/4) {
+            // left side
+            if (sector_x < COL_WIDTH/2) {
+                if (sector_y < diagonal*sector_x) {
+                    g = sector_y / (ROW_HEIGHT/4);
+                } else {
+                    g = sector_x / (COL_WIDTH/2);
+                }
+            // right side
             } else {
-                g = sector_x / (COL_WIDTH/2);
+                float adjusted_x = (sector_x-(COL_WIDTH/2));
+                if (sector_y < (diagonal*adjusted_x*-1)+(ROW_HEIGHT/4)) {
+                    g = sector_y / (ROW_HEIGHT/4);
+                } else {
+                    g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
+                }
             }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(COL_WIDTH/2));
-            if (sector_y < (diagonal*adjusted_x*-1)+(ROW_HEIGHT/4)) {
-                g = sector_y / (ROW_HEIGHT/4);
+        // middle section
+        } else if ((sector_y > ROW_HEIGHT/4) && sector_y < 3*ROW_HEIGHT/4) {
+            //g = 0.75;
+            if (sector_x < COL_WIDTH/2) {
+                g = sector_x / (COL_WIDTH/2);
             } else {
+                float adjusted_x = (sector_x-(COL_WIDTH/2));
                 g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
             }
-        }
-    // middle section
-    } else if ((sector_y > ROW_HEIGHT/4) && sector_y < 3*ROW_HEIGHT/4) {
-        //g = 0.75;
-        if (sector_x < COL_WIDTH/2) {
-            g = sector_x / (COL_WIDTH/2);
+        // top fourth
         } else {
-            float adjusted_x = (sector_x-(COL_WIDTH/2));
-            g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
-        }
-    // top fourth
-    } else {
-        // left side
-        if (sector_x < COL_WIDTH/2) {
-            if (sector_y > (diagonal*sector_x*-1) + ROW_HEIGHT) {
-                float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
-                g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
+            // left side
+            if (sector_x < COL_WIDTH/2) {
+                if (sector_y > (diagonal*sector_x*-1) + ROW_HEIGHT) {
+                    float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
+                    g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
+                } else {
+                    g = sector_x / (COL_WIDTH/2);
+                }
+            // right side
             } else {
-                g = sector_x / (COL_WIDTH/2);
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(COL_WIDTH/2));
-            if (sector_y > (diagonal*adjusted_x)+(3*ROW_HEIGHT/4)) {
-                float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
-                g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
-            } else {
-                g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
+                float adjusted_x = (sector_x-(COL_WIDTH/2));
+                if (sector_y > (diagonal*adjusted_x)+(3*ROW_HEIGHT/4)) {
+                    float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
+                    g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
+                } else {
+                    g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
+                }
             }
         }
     }
-
-    r = rand(coord);
+    //r = rand(coord);
 
     //gl_FragColor = vec4(mod(coord.x*u_time, 1.0), 0.0, coord.y, alpha);
     //gl_FragColor = vec4(r, g, b, alpha);
-    gl_FragColor = vec4(0.0, g, b, 1.0);
+    gl_FragColor = vec4(r, g, b, 1.0);
 }
