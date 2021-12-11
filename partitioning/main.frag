@@ -5,61 +5,6 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec4 u_date;
-/*
-float get_pixel_height (float pyramid_height, float pyramid_width,
-                        vec2 coord) {
-    float diagonal = pyramid_height/(2*pyramid_width);
-    float sector_x = mod(coord.x, pyramid_width);
-    float sector_y = mod(coord.y, pyramid_height);
-    // bottom fourth
-    if (sector_y < ROW_HEIGHT/4) {
-        // left side
-        if (sector_x < COL_WIDTH/2) {
-            if (sector_y < diagonal*sector_x) {
-                g = sector_y / (ROW_HEIGHT/4);
-            } else {
-                g = sector_x / (COL_WIDTH/2);
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(COL_WIDTH/2));
-            if (sector_y < (diagonal*adjusted_x*-1)+(ROW_HEIGHT/4)) {
-                g = sector_y / (ROW_HEIGHT/4);
-            } else {
-                g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
-            }
-        }
-    // middle section
-    } else if ((sector_y > ROW_HEIGHT/4) && sector_y < 3*ROW_HEIGHT/4) {
-        //g = 0.75;
-        if (sector_x < COL_WIDTH/2) {
-            g = sector_x / (COL_WIDTH/2);
-        } else {
-            float adjusted_x = (sector_x-(COL_WIDTH/2));
-            g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
-        }
-    // top fourth
-    } else {
-        // left side
-        if (sector_x < COL_WIDTH/2) {
-            if (sector_y > (diagonal*sector_x*-1) + ROW_HEIGHT) {
-                float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
-                g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
-            } else {
-                g = sector_x / (COL_WIDTH/2);
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(COL_WIDTH/2));
-            if (sector_y > (diagonal*adjusted_x)+(3*ROW_HEIGHT/4)) {
-                float adjusted_y = (sector_y-(3*ROW_HEIGHT/4));
-                g = ((adjusted_y*-1)/(ROW_HEIGHT/4)) + 1.0;
-            } else {
-                g = ((adjusted_x*-1)/(COL_WIDTH/2)) + 1.0;
-            }
-        }
-    }
-*/
 
 float get_pixel_height (float pyramid_height, float pyramid_width, vec2 coord) {
     float diagonal = pyramid_height/(2*pyramid_width);
@@ -160,26 +105,6 @@ void main() {
     int v_sector = int(floor((coord.y+ADJUST)/ROW_HEIGHT));
 
     float alpha = 0.0;
-    float r = 0.0;
-    float g = 0.0;
-    float b = 0.0;
-    // draw verticals
-    if (values_match((h_sector*COL_WIDTH) + h_offset,
-                     coord.x, TOLERANCE)) {
-        alpha = 1.0;
-    }
-    // draw horizontals
-    if (values_match(v_sector*ROW_HEIGHT, coord.y, TOLERANCE)) {
-        alpha = 1.0;
-    }
-
-    // sector marking
-    if (int(mod(h_sector, 2.0)) == 0) {
-        b += 0.5;
-    }
-    if (int(mod(v_sector, 2.0)) == 0) {
-        b += 0.5;
-    }
 
     // procedurally get anchor point
     float pyramid_width;
@@ -203,23 +128,21 @@ void main() {
     vec2 anchor = vec2((h_sector*COL_WIDTH)+(pyramid_width/2)-center_shift,
                         v_sector*ROW_HEIGHT + ROW_HEIGHT/2);
 
-    if (vectors_match(coord, anchor, TOLERANCE*5)) {
-        r = 1.0;
-    }
-
     float sector_x = mod(coord.x, COL_WIDTH);
     float sector_y = mod(coord.y, ROW_HEIGHT);
     float diagonal = ROW_HEIGHT/(2*COL_WIDTH);
-    float sector_sign;
     float height;
-    if (h_offset == 0.0 || h_sector == 0 || h_sector == N_COLS) {
-        g = get_pixel_height(ROW_HEIGHT, pyramid_width, coord);
-    } else {
-        g = get_pixel_height(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y));
+    float shifted_time = rand(anchor) * u_time;
+    float t_seed = mod(shifted_time, 2.0);
+    if (t_seed > 1.0 ) {
+        t_seed = 2.0-t_seed;
     }
-    //r = rand(coord);
+    if (h_offset == 0.0 || h_sector == 0 || h_sector == N_COLS) {
+        height = t_seed * get_pixel_height(ROW_HEIGHT, pyramid_width, coord);
+    } else {
+        height = get_pixel_height(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y));
+    }
+    alpha = t_seed * height;
 
-    //gl_FragColor = vec4(mod(coord.x*u_time, 1.0), 0.0, coord.y, alpha);
-    //gl_FragColor = vec4(r, g, b, alpha);
-    gl_FragColor = vec4(r, g, b, 1.0);
+    gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
 }
