@@ -124,7 +124,7 @@ void main() {
         t_seed = 2.0-t_seed;
     }
     if (h_offset == 0.0 || h_sector == 0 || h_sector == N_COLS) {
-        height = t_seed * get_pixel_height(ROW_HEIGHT, pyramid_width, coord);
+        height = get_pixel_height(ROW_HEIGHT, pyramid_width, coord);
     } else {
         height = get_pixel_height(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y));
     }
