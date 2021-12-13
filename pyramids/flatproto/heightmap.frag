@@ -69,19 +69,6 @@ float rand(vec2 co) {
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * (u_date.z * 3674.2));
 }
 
-bool values_match(float v1, float v2, float tolerance) {
-    return v1 < v2 + tolerance && v1 > v2 - tolerance;
-}
-
-bool vectors_match(vec2 v1, vec2 v2, float tolerance) {
-    return v1.x < v2.x + tolerance && v1.x > v2.x - tolerance &&
-                v1.y < v2.y + tolerance && v1.y > v2.y - tolerance;
-}
-
-int arr2d_index(int row, int col, int colsize) {
-    return (colsize * row) + col;
-}
-
 void main() {
     // constants for generating grid
     const float ROW_HEIGHT = 0.1;
@@ -89,7 +76,6 @@ void main() {
     const int N_COLS = 5;
 
     int N_ROWS = int(floor(1.0/ROW_HEIGHT));
-    vec2 anchors[66]; // N_ROWS+1 * N_COLS+1 -- must be updated if these change!
 
     // 2D prototype
     vec2 coord = gl_FragCoord.xy/u_resolution;
