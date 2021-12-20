@@ -2,8 +2,6 @@
 
 import bpy
 import bmesh
-import math
-import mathutils
 
 h = 0.1
 verts = [
@@ -104,23 +102,11 @@ def main():
     ROW_HEIGHT = 1.0/N_ROWS
     COL_WIDTH = 1.0/N_COLS
 
-    #draw_pyramid(Vertex(      0.0, ROW_HEIGHT, 0.0),
-    #             Vertex(      0.0,        0.0, 0.0),
-    #             Vertex(COL_WIDTH, ROW_HEIGHT, 0.0),
-    #             Vertex(COL_WIDTH,        0.0, 0.0))
-
-    #draw_pyramid(Vertex(lower_x, upper_y, 0.0),
-    #             Vertex(lower_x, lower_y, 0.0),
-    #             Vertex(upper_x, upper_y, 0.0),
-    #             Vertex(upper_x, lower_y, 0.0))
-    #draw_pyramid(0.0, COL_WIDTH, 0.0, ROW_HEIGHT)
-    #draw_pyramid(COL_WIDTH, COL_WIDTH*2, 0.0, ROW_HEIGHT)
     for i in range(N_ROWS):
         # 'lower' and 'upper' y values
         ly = i * ROW_HEIGHT
         uy = ly + ROW_HEIGHT
         if i % 2 == 1:
-            #pass
             # odd row - horizontal offset makes partitioning a bit more complex
             x_offset = COL_WIDTH/2
             # draw left side half width pyramid first
@@ -130,8 +116,7 @@ def main():
                 lx = (j * COL_WIDTH) + x_offset
                 ux = lx + + COL_WIDTH
                 draw_pyramid(lx, ux, ly, uy)
-            ## draw right side half width pyramid
-            #lx = (N_COLS*COL_WIDTH)
+            # draw right side half width pyramid
             draw_pyramid(1.0 - x_offset, 1.0, ly, uy)
         else:
             # even row - paritioning is luckily much simpler
