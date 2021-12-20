@@ -71,11 +71,11 @@ def draw_pyramid(v0, v1, v2, v3):
             verts.append(vi.as_tuple())
             v_counter+=1
 
-    height = v0.y - v1.y
-    width = v2.x - v0.x
+    height = v0.y - v1.y  # ex. ROW_HEIGHT
+    width = v2.x - v0.x   # ex. COL_WIDTH
 
-    v4 = (height/2, 3*width/4, 0.0)
-    v5 = (height/2,   width/4, 0.0)
+    v4 = (width/2, 3*height/4, 0.0)
+    v5 = (width/2,   height/4, 0.0)
     verts.append(v4)
     e.append(v_counter)
     v_counter+=1
