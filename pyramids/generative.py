@@ -16,11 +16,11 @@ verts = [
 ]
 faces = [
     # top/bottom face
-    #(0, 1, 3, 2),
-    (4, 5, 7, 6),
+    #(4, 5, 7, 6),
+    (4, 6, 7, 5),
     # sides
     (0, 4, 5, 1),
-    (1, 3, 7, 5),
+    (5, 7, 3, 1),
     (2, 3, 7, 6),
     (0, 2, 6, 4)
 ]
@@ -86,10 +86,10 @@ def draw_pyramid(lower_x, upper_x, lower_y, upper_y):
     e.append(v_counter)
     v_counter+=1
 
-    faces.append((e[0], e[2], e[4]))
+    faces.append((e[4], e[2], e[0]))
     faces.append((e[1], e[3], e[5]))
-    faces.append((e[0], e[4], e[5], e[1]))
-    faces.append((e[2], e[4], e[5], e[3]))
+    faces.append((e[1], e[5], e[4], e[0]))
+    faces.append((e[4], e[5], e[3], e[2]))
 
 
 def main():
