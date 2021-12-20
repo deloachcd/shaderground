@@ -53,7 +53,12 @@ class Vertex:
         return (self.x, self.y, self.z)
 
 
-def draw_pyramid(v0, v1, v2, v3):
+def draw_pyramid(lower_x, upper_x, lower_y, upper_y):
+    v0 = Vertex(lower_x, upper_y, 0.0)
+    v1 = Vertex(lower_x, lower_y, 0.0)
+    v2 = Vertex(upper_x, upper_y, 0.0)
+    v3 = Vertex(upper_x, lower_y, 0.0)
+
     # v0 -> upper left  v2 -> upper right
     # v1 -> bottom left v3 -> bottom right
     global verts
@@ -74,8 +79,8 @@ def draw_pyramid(v0, v1, v2, v3):
     height = v0.y - v1.y  # ex. ROW_HEIGHT
     width = v2.x - v0.x   # ex. COL_WIDTH
 
-    v4 = (width/2, 3*height/4, 0.0)
-    v5 = (width/2,   height/4, 0.0)
+    v4 = (lower_x+(width/2), lower_y+(3*height/4), 0.0)
+    v5 = (lower_x+(width/2),   lower_y+(height/4), 0.0)
     verts.append(v4)
     e.append(v_counter)
     v_counter+=1
@@ -99,26 +104,41 @@ def main():
     ROW_HEIGHT = 1.0/N_ROWS
     COL_WIDTH = 1.0/N_COLS
 
-    draw_pyramid(Vertex(      0.0, ROW_HEIGHT, 0.0),
-                 Vertex(      0.0,        0.0, 0.0),
-                 Vertex(COL_WIDTH, ROW_HEIGHT, 0.0),
-                 Vertex(COL_WIDTH,        0.0, 0.0))
+    #draw_pyramid(Vertex(      0.0, ROW_HEIGHT, 0.0),
+    #             Vertex(      0.0,        0.0, 0.0),
+    #             Vertex(COL_WIDTH, ROW_HEIGHT, 0.0),
+    #             Vertex(COL_WIDTH,        0.0, 0.0))
 
-    #for i in range(N_ROWS):
-    #    lower_y = i * ROW_HEIGHT
-    #    upper_y = lower_y + ROW_HEIGHT
-    #    odd_row = i % 2 == 1
-    #    if odd_row:
-    #        h_corner_offset = COL_WIDTH/2 if odd_row else 0.0
-    #        subdivide_pyramid(mesh, 0.0, h_corner_offset, lower_y, upper_y, z_origin)
-    #    else:
-    #        h_corner_offset = 0.0
-    #    for j in range(N_COLS):
-    #        left_x = (j * COL_WIDTH) + h_corner_offset
-    #        right_x = x_min + left_x + (h_corner_offset
-    #                                    if (odd_row and j == N_COLS-1)
-    #                                    else ROW_HEIGHT)
-    #        subdivide_pyramid(left_x, right_x, lower_y, upper_y)
+    #draw_pyramid(Vertex(lower_x, upper_y, 0.0),
+    #             Vertex(lower_x, lower_y, 0.0),
+    #             Vertex(upper_x, upper_y, 0.0),
+    #             Vertex(upper_x, lower_y, 0.0))
+    #draw_pyramid(0.0, COL_WIDTH, 0.0, ROW_HEIGHT)
+    #draw_pyramid(COL_WIDTH, COL_WIDTH*2, 0.0, ROW_HEIGHT)
+    for i in range(N_ROWS):
+        # 'lower' and 'upper' y values
+        ly = i * ROW_HEIGHT
+        uy = ly + ROW_HEIGHT
+        if i % 2 == 1:
+            pass
+            ## odd row - horizontal offset makes partitioning a bit more complex
+            #x_offset = COL_WIDTH/2
+            ## draw left side half width pyramid first
+            #draw_pyramid(0.0, x_offset, ly, uy)
+            ## draw full-width pyramids
+            #for j in range(N_COLS-1):
+            #    lx = (j * COL_WIDTH) + x_offset
+            #    ux = lx + x_offset + COL_WIDTH
+            #    draw_pyramid(lx, ux, ly, uy)
+            ## draw right side half width pyramid
+            #lx = N_COLS*COL_WIDTH
+            #draw_pyramid(lx, lx + x_offset, ly, uy)
+        else:
+            # even row - paritioning is luckily much simpler
+            for j in range(N_COLS):
+                lx = j * COL_WIDTH
+                rx = lx + COL_WIDTH
+                draw_pyramid(lx, rx, ly, uy)
 
     # mesh should have its components completed at this point
     mesh_data.from_pydata(verts, edges, faces)
