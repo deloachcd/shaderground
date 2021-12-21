@@ -48,7 +48,7 @@ void main(void) {
         int N_ROWS = int(floor(1.0/ROW_HEIGHT));
 
         // sector corresponds to number of rows/columns in
-        float h_offset = (mod(floor(coord.y*ROW_HEIGHT*100),2)/2.0)*COL_WIDTH;
+        float h_offset = (mod(floor(coord.y*ROW_HEIGHT*100.0),2.0)/2.0)*COL_WIDTH;
         int h_sector = int(floor(((coord.x+h_offset)+ADJUST)/COL_WIDTH));
         int v_sector = int(floor((coord.y+ADJUST)/ROW_HEIGHT));
 
@@ -56,7 +56,7 @@ void main(void) {
         float pyramid_width;
         float center_shift;
         if (h_offset != 0.0 && (h_sector == 0 || h_sector == N_COLS) ) {
-            pyramid_width = COL_WIDTH/2;
+            pyramid_width = COL_WIDTH/2.0;
             if (h_sector == 0) {
                 center_shift = 0.0;
             } else {
@@ -71,8 +71,8 @@ void main(void) {
             }
         }
 
-        vec2 anchor = vec2((h_sector*COL_WIDTH)+(pyramid_width/2)-center_shift,
-                            v_sector*ROW_HEIGHT + ROW_HEIGHT/2);
+        vec2 anchor = vec2((float(h_sector)*COL_WIDTH)+(pyramid_width/2.0)-center_shift,
+                            float(v_sector)*ROW_HEIGHT + ROW_HEIGHT/2.0);
         float sector_x = mod(coord.x, COL_WIDTH);
         float sector_y = mod(coord.y, ROW_HEIGHT);
         float height = 0.0;

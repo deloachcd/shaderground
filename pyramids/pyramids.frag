@@ -34,7 +34,7 @@ void main(void) {
         int N_ROWS = int(floor(1.0/ROW_HEIGHT));
 
         // on top plane
-        vec3 p = normalize(v_position);
+        vec3 p = normalize(v_position.xyz);
         diffuse = (dot(p, l) + 1.0 ) * 0.5;
         vec2 coord = v_position.zx;
         // I lifted these values straight from the OBJ mesh data, don't know if
