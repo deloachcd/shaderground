@@ -15,63 +15,6 @@ attribute vec3   a_normal;
 varying vec3     v_normal;
 #endif
 
-float get_pixel_height (float pyramid_height, float pyramid_width, vec2 coord) {
-    float diagonal = pyramid_height/(2*pyramid_width);
-    float sector_x = mod(coord.x, pyramid_width);
-    float sector_y = mod(coord.y, pyramid_height);
-    float height = 0.0;
-
-    // bottom fourth
-    if (sector_y < pyramid_height/4) {
-        // left side
-        if (sector_x < pyramid_width/2) {
-            if (sector_y < diagonal*sector_x) {
-                height = sector_y / (pyramid_height/4);
-            } else {
-                height = sector_x / (pyramid_width/2);
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(pyramid_width/2));
-            if (sector_y < (diagonal*adjusted_x*-1)+(pyramid_height/4)) {
-                height = sector_y / (pyramid_height/4);
-            } else {
-                height = ((adjusted_x*-1)/(pyramid_width/2)) + 1.0;
-            }
-        }
-    // middle section
-    } else if ((sector_y > pyramid_height/4) && sector_y < 3*pyramid_height/4) {
-        //height = 0.75;
-        if (sector_x < pyramid_width/2) {
-            height = sector_x / (pyramid_width/2);
-        } else {
-            float adjusted_x = (sector_x-(pyramid_width/2));
-            height = ((adjusted_x*-1)/(pyramid_width/2)) + 1.0;
-        }
-    // top fourth
-    } else {
-        // left side
-        if (sector_x < pyramid_width/2) {
-            if (sector_y > (diagonal*sector_x*-1) + pyramid_height) {
-                float adjusted_y = (sector_y-(3*pyramid_height/4));
-                height = ((adjusted_y*-1)/(pyramid_height/4)) + 1.0;
-            } else {
-                height = sector_x / (pyramid_width/2);
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(pyramid_width/2));
-            if (sector_y > (diagonal*adjusted_x)+(3*pyramid_height/4)) {
-                float adjusted_y = (sector_y-(3*pyramid_height/4));
-                height = ((adjusted_y*-1)/(pyramid_height/4)) + 1.0;
-            } else {
-                height = ((adjusted_x*-1)/(pyramid_width/2)) + 1.0;
-            }
-        }
-    }
-    return height;
-}
-
 float rand(vec2 co) {
     // generate a random value based on the seconds in the day that have
     // passed when loading the shader
@@ -88,7 +31,7 @@ void main(void) {
 
         // 'coord' allows us to interface with the top of our mesh as a 2D canvas
         // with normallized coordinates
-        vec2 coord = v_position.zx;
+        vec2 coord = v_position.xz;
         // I lifted these values straight from the OBJ mesh data, don't know if
         // there's a 'cleaner' way to do this but hey, it works.
         coord.x += 6.053;
@@ -98,7 +41,6 @@ void main(void) {
 
         // these determine the rendering behavior
         const float ROW_HEIGHT = 0.1;
-        const float MIN_LEN = 0.08;
         const int N_COLS = 5;
         const float ADJUST = 0.0001;
         const float TOLERANCE = 0.001;
@@ -133,19 +75,15 @@ void main(void) {
                             v_sector*ROW_HEIGHT + ROW_HEIGHT/2);
         float sector_x = mod(coord.x, COL_WIDTH);
         float sector_y = mod(coord.y, ROW_HEIGHT);
-        float diagonal = ROW_HEIGHT/(2*COL_WIDTH);
-        float height;
+        float height = 0.0;
         float shifted_time = rand(anchor) * u_time;
         float t_seed = mod(shifted_time, 2.0);
-        if (t_seed > 1.0 ) {
+        if (t_seed > 1.0) {
             t_seed = 2.0-t_seed;
         }
-        if (h_offset == 0.0 || h_sector == 0 || h_sector == N_COLS) {
-            height = get_pixel_height(ROW_HEIGHT, pyramid_width, coord);
-        } else {
-            height = get_pixel_height(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y));
+        if (!(mod(coord.y, ROW_HEIGHT) < 0.01)) {
+            height = 1.0;
         }
-        //v_position.y += rand(coord) * 10 * t_seed;
         if (distance(coord, vec2(coord.x, 0.0)) > 0.01 &&
                 distance(coord, vec2(coord.x, 1.0)) > 0.01 &&
                 distance(coord, vec2(0.0, coord.y)) > 0.01 &&

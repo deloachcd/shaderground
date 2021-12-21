@@ -26,8 +26,26 @@ void main(void) {
     color = vec3(1.0);
 #ifdef MODEL_VERTEX_NORMAL
     if (v_normal == vec3(0.0, 1.0, 0.0)) {
+        const float ROW_HEIGHT = 0.1;
+        const int N_COLS = 5;
+        const float ADJUST = 0.0001;
+        const float TOLERANCE = 0.001;
+        float COL_WIDTH = 1.0/float(N_COLS);
+        int N_ROWS = int(floor(1.0/ROW_HEIGHT));
+
+        // on top plane
         vec3 p = normalize(v_position);
         diffuse = (dot(p, l) + 1.0 ) * 0.5;
+        vec2 coord = v_position.zx;
+        // I lifted these values straight from the OBJ mesh data, don't know if
+        // there's a 'cleaner' way to do this but hey, it works.
+        coord.x += 6.053;
+        coord.y += 6.1318;
+        coord.x /= 6.053 + 6.051;
+        coord.y /= 6.13 + 6.002;
+
+        color = vec3(coord.x, coord.y, 0.0);
+        diffuse = (dot(n, l) + 1.0 ) * 0.5;
     } else {
         diffuse = (dot(n, l) + 1.0 ) * 0.5;
     }

@@ -2,8 +2,10 @@
 
 import bpy
 import bmesh
+import mathutils
+import os
 
-h = 0.1
+h = 0.01
 verts = [
     (0.0, 1.0, 0.0),
     (0.0, 0.0, 0.0),
@@ -15,8 +17,7 @@ verts = [
     (1.0, 0.0,  -h)
 ]
 faces = [
-    # top/bottom face
-    #(4, 5, 7, 6),
+    # bottom face
     (4, 6, 7, 5),
     # sides
     (0, 4, 5, 1),
@@ -93,8 +94,14 @@ def draw_pyramid(lower_x, upper_x, lower_y, upper_y):
 
 
 def main():
+    global h
+    global verts
+    global faces
+    global edges
+    global v_counter
+
+    # name for generated mesh
     mesh_name = "Pyramid Plane"
-    mesh_data = bpy.data.meshes.new(mesh_name)
 
     ## TODO subdivide the mesh here
     N_ROWS = 10
@@ -125,7 +132,24 @@ def main():
                 rx = lx + COL_WIDTH
                 draw_pyramid(lx, rx, ly, uy)
 
-    # mesh should have its components completed at this point
+    # center our mesh, and scale it
+    for i, vert in enumerate(verts):
+        size_mesh = 12.1838
+        verts[i] = ((vert[0]-0.5)*size_mesh, (vert[1]-0.5)*size_mesh, vert[2]*size_mesh)
+
+    # mesh should have its components completed at this point, blender specific stuff
+    # happens here
+
+    # delete default blender stuff
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.data.objects['Cube'].select_set(True)
+    bpy.ops.object.delete()
+    bpy.data.objects['Camera'].select_set(True)
+    bpy.ops.object.delete()
+    bpy.data.objects['Light'].select_set(True)
+    bpy.ops.object.delete()
+
+    mesh_data = bpy.data.meshes.new(mesh_name)
     mesh_data.from_pydata(verts, edges, faces)
     bm = bmesh.new()
     bm.from_mesh(mesh_data)
@@ -133,6 +157,12 @@ def main():
     bm.free()
     mesh_obj = bpy.data.objects.new(mesh_data.name, mesh_data)
     bpy.context.collection.objects.link(mesh_obj)
+
+    # export to OBJ
+    blend_file_path = bpy.data.filepath
+    directory = os.path.dirname(blend_file_path)
+    target_file = os.path.join(directory, 'meshes/generated_plane.obj')
+    bpy.ops.export_scene.obj(filepath=target_file)
 
 
 if __name__ == "__main__":
