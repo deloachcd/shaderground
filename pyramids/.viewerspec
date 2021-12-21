@@ -1,1 +1,1 @@
-generative_auto.obj pyramids.frag pyramids.vert
+meshes/generated_plane.obj pyramids.frag pyramids.vert
