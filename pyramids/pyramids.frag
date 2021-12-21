@@ -115,9 +115,10 @@ void main(void) {
         coord.y += 6.1318;
         coord.x /= 6.053 + 6.051;
         coord.y /= 6.13 + 6.002;
+        float deg = 90.0;
         mat2 cheater = mat2(
-            cos(90.0), -sin(90.0),
-            sin(90.0), cos(90.0)
+            -1.0, 0.0,
+             0.0, -1.0
         );
         coord *= cheater;
 
