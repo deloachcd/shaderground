@@ -21,6 +21,10 @@ float rand(vec2 co) {
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * (u_date.z * 3674.2));
 }
 
+float get_theta(float axis_val, float height) {
+    return asin(axis_val * sqrt((axis_val*axis_val)+(height*height)));
+}
+
 void main(void) {
     v_position = a_position;
 
@@ -34,10 +38,14 @@ void main(void) {
         vec2 coord = v_position.xz;
         // I lifted these values straight from the OBJ mesh data, don't know if
         // there's a 'cleaner' way to do this but hey, it works.
-        coord.x += 6.053;
-        coord.y += 6.1318;
-        coord.x /= 6.053 + 6.051;
-        coord.y /= 6.13 + 6.002;
+        //coord.x += 6.053;
+        coord.x += 6.0919;
+        coord.y += 6.0919;
+        // TODO figure out what's going on here
+        //coord.x /= 12.1838;
+        //coord.y /= 12.1838;
+        coord.x /= 12.104;
+        coord.y /= 12.104;
 
         // these determine the rendering behavior
         const float ROW_HEIGHT = 0.1;
