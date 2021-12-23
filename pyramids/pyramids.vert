@@ -153,13 +153,13 @@ vec3 get_vertex_normal(float pyramid_height, float pyramid_width, vec2 coord) {
     } else if (sector == BOTTOM_SECTOR) {
         normal = vec3(0.0, 0.0, -1.0);
     } else if (sector == RIGHT_SECTOR) {
-        normal = vec3(-1.0, 0.0, 0.0);
+        normal = vec3(1.0, 0.0, 0.0);
     } else if (sector == TOP_SECTOR) {
         normal = vec3(0.0, 0.0, 1.0);
     }
 
     // compute normal vector from theta
-    normal = rotate_vector(vec3(0.0, 1.0, 0.0), theta + 1.0, rotation_axis);
+    //normal = rotate_vector(vec3(0.0, 1.0, 0.0), theta + 1.0, rotation_axis);
 
     return normal;
 }

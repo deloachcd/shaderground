@@ -103,7 +103,8 @@ void main(void) {
 #ifndef BACKGROUND
     color = vec3(1.0);
 #ifdef MODEL_VERTEX_NORMAL
-    if (v_normal == vec3(0.0, 1.0, 0.0)) {
+    /*
+    if (v_position.y >= 0.0) {
         const float ROW_HEIGHT = 0.1;
         const int N_COLS = 5;
         const float ADJUST = 0.0001;
@@ -165,10 +166,24 @@ void main(void) {
 
         color = vec3(1.0);
         diffuse = (dot(n, l) + 1.0 ) * 0.5;
-    } else {
-        diffuse = (dot(n, l) + 1.0 ) * 0.5;
     }
-    color *= diffuse;
+    */
+    diffuse = (dot(n, l) + 1.0 ) * 0.5;
+    if (v_normal == vec3(1.0, 0.0, 0.0)) {
+        // right sector should be red
+        color = vec3(1.0, 0.0, 0.0);
+    } else if (v_normal == vec3(-1.0, 0.0, 0.0)) {
+        // left sector should be yellow
+        color = vec3(1.0, 1.0, 0.0);
+    } else if (v_normal == vec3(0.0, 0.0, 1.0)) {
+        // bottom sector should be blue
+        color = vec3(0.0, 0.0, 1.0);
+    } else if (v_normal == vec3(0.0, 0.0, -1.0)) {
+        // top sector should be cyan
+        color = vec3(0.0, 1.0, 1.0);
+    } else {
+        color *= diffuse;
+    }
 #endif
 #endif
 
