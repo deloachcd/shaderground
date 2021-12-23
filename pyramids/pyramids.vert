@@ -217,7 +217,8 @@ void main(void) {
                 center_shift = h_offset;
             }
         }
-        v_normal = get_vertex_normal(ROW_HEIGHT, pyramid_width, coord);
+        //v_normal = get_vertex_normal(ROW_HEIGHT, pyramid_width, coord);
+        v_normal = vec3(0.0, rand(coord.yx), rand(coord.xy));
 
         vec2 anchor = vec2((float(h_sector)*COL_WIDTH)+(pyramid_width/2.0)-center_shift,
                             float(v_sector)*ROW_HEIGHT + ROW_HEIGHT/2.0);

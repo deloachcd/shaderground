@@ -182,10 +182,10 @@ void main(void) {
         // top sector should be cyan
         color = vec3(0.0, 1.0, 1.0);
     } else {
-        color *= diffuse;
+        //color *= diffuse;
+        color = v_normal;
     }
 #endif
 #endif
-
     gl_FragColor = vec4(color, 1.0);
 }
