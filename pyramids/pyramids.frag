@@ -91,77 +91,6 @@ vec2 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord) {
     return vec2(float(sector), height);
 }
 
-int get_pixel_sector(float pyramid_height, float pyramid_width, vec2 coord) {
-    float diagonal = pyramid_height/(2.0*pyramid_width);
-    float sector_x = mod(coord.x, pyramid_width);
-    float sector_y = mod(coord.y, pyramid_height);
-    float height = 0.0;
-
-    int sector;
-    const int LEFT_SECTOR = 0;
-    const int BOTTOM_SECTOR = 1;
-    const int RIGHT_SECTOR = 2;
-    const int TOP_SECTOR = 3;
-    // bottom fourth
-    if (sector_y < pyramid_height/4.0) {
-        // left side
-        if (sector_x < pyramid_width/2.0) {
-            if (sector_y < diagonal*sector_x) {
-                //height = sector_y / (pyramid_height/4.0);
-                sector = BOTTOM_SECTOR;
-            } else {
-                //height = sector_x / (pyramid_width/2.0);
-                sector = LEFT_SECTOR;
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(pyramid_width/2.0));
-            if (sector_y < (diagonal * adjusted_x * -1.0)+(pyramid_height/4.0)) {
-                //height = sector_y / (pyramid_height/4.0);
-                sector = BOTTOM_SECTOR;
-            } else {
-                //height = ((adjusted_x * -1.0)/(pyramid_width/2.0)) + 1.0;
-                sector = RIGHT_SECTOR;
-            }
-        }
-    // middle section
-    } else if ((sector_y > pyramid_height/4.0) && sector_y < 3.0*pyramid_height/4.0) {
-        if (sector_x < pyramid_width/2.0) {
-            //height = sector_x / (pyramid_width/2.0);
-            sector = LEFT_SECTOR;
-        } else {
-            //float adjusted_x = (sector_x-(pyramid_width/2.0));
-            //height = ((adjusted_x * -1.0)/(pyramid_width/2.0)) + 1.0;
-            sector = RIGHT_SECTOR;
-        }
-    // top fourth
-    } else {
-        // left side
-        if (sector_x < pyramid_width/2.0) {
-            if (sector_y > (diagonal * sector_x * -1.0) + pyramid_height) {
-                //float adjusted_y = (sector_y-(3.0*pyramid_height/4.0));
-                //height = ((adjusted_y * -1.0)/(pyramid_height/4.0)) + 1.0;
-                sector = TOP_SECTOR;
-            } else {
-                //height = sector_x / (pyramid_width/2.0);
-                sector = LEFT_SECTOR;
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(pyramid_width/2.0));
-            if (sector_y > (diagonal*adjusted_x)+(3.0*pyramid_height/4.0)) {
-                //float adjusted_y = (sector_y-(3.0*pyramid_height/4.0));
-                //height = ((adjusted_y * -1.0)/(pyramid_height/4.0)) + 1.0;
-                sector = TOP_SECTOR;
-            } else {
-                //height = ((adjusted_x * -1.0)/(pyramid_width/2.0)) + 1.0;
-                sector = RIGHT_SECTOR;
-            }
-        }
-    }
-    return sector;
-}
-
 void main(void) {
     vec3 color = vec3(0.0);
 
@@ -192,17 +121,10 @@ void main(void) {
         coord.y += 6.0919;
         coord.x /= 12.1838;
         coord.y /= 12.1838;
-        // TODO: see if I can avoid having to do this!
-        // matrix rotates coord by 180 degrees
-        mat2 cheater = mat2(
-            -1.0, 0.0,
-             0.0, -1.0
-        );
-        coord *= cheater;
 
         float h_offset = (mod(floor(coord.y*ROW_HEIGHT*100.0),2.0)/2.0)*COL_WIDTH;
-        int h_sector = int(abs(floor(((coord.x+h_offset)+ADJUST)/COL_WIDTH)));
-        int v_sector = int(abs(floor((coord.y+ADJUST)/ROW_HEIGHT)));
+        int h_sector = int(floor(((coord.x+h_offset)+ADJUST)/COL_WIDTH));
+        int v_sector = int(floor((coord.y+ADJUST)/ROW_HEIGHT));
 
         float pyramid_width;
         float center_shift;
@@ -241,7 +163,7 @@ void main(void) {
             color = vec3(0.0, height, height);
         }
 
-        //color = vec3(coord.x, coord.y, 0.0);
+        color = vec3(1.0);
         diffuse = (dot(n, l) + 1.0 ) * 0.5;
     } else {
         diffuse = (dot(n, l) + 1.0 ) * 0.5;
