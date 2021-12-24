@@ -26,11 +26,29 @@ float rand(vec2 co) {
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * (u_date.z * 3674.2));
 }
 
-vec3 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord) {
+vec3 rotate_vector(vec3 vector, float theta, int axis) {
+    mat3 matrix;
+    if (axis == X_AXIS) {
+        matrix = mat3(1.0,         0.0,         0.0,
+                      0.0,  cos(theta), -sin(theta),
+                      0.0,  sin(theta),  cos(theta));
+    } else if (axis == Z_AXIS) {
+        matrix = mat3(cos(theta), -sin(theta), 0.0,
+                      sin(theta),  cos(theta), 0.0,
+                             0.0,         0.0, 1.0);
+    } else {
+        // you shouldn't get here, so just return identity matrix
+        matrix = mat3(1.0);
+    }
+    return matrix * vector;
+}
+
+vec3 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord, float height) {
     float diagonal = pyramid_height/(2.0*pyramid_width);
     float sector_x = mod(coord.x, pyramid_width);
     float sector_y = mod(coord.y, pyramid_height);
-    float height = 0.0;
+    //float height = 0.0;
+    float original_height = height;
     int sector;
 
     // bottom fourth
@@ -112,7 +130,9 @@ vec3 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord) {
         sign_theta = 1.0;
         axis_value = sector_y;
     }
+    height = original_height;
     float theta = sign_theta * asin((axis_value*axis_value) + (0.5*axis_value*height));
+    return rotate_vector(vec3(0.0, 1.0, 0.0), theta*10.0, rotation_axis);
 
     vec3 normal;
     if (sector == LEFT_SECTOR) {
@@ -188,7 +208,7 @@ void main(void) {
         float diagonal = ROW_HEIGHT/(2.0*pyramid_width);
         float height;
         int sector;
-        n = get_pixel_vector(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y));
+        n = get_pixel_vector(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y), v_position.y);
         height = v_position.y;
 
         diffuse = (dot(n, l) + 1.0 ) * 0.5;
