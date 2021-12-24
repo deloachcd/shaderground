@@ -13,23 +13,26 @@ varying vec4 v_position;
 varying vec3    v_normal;
 #endif
 
+const int LEFT_SECTOR = 0;
+const int BOTTOM_SECTOR = 1;
+const int RIGHT_SECTOR = 2;
+const int TOP_SECTOR = 3;
+const int X_AXIS = 0;
+const int Z_AXIS = 1;
+
 float rand(vec2 co) {
     // generate a random value based on the seconds in the day that have
     // passed when loading the shader
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * (u_date.z * 3674.2));
 }
 
-vec2 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord) {
+vec3 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord) {
     float diagonal = pyramid_height/(2.0*pyramid_width);
     float sector_x = mod(coord.x, pyramid_width);
     float sector_y = mod(coord.y, pyramid_height);
     float height = 0.0;
     int sector;
 
-    const int LEFT_SECTOR = 0;
-    const int BOTTOM_SECTOR = 1;
-    const int RIGHT_SECTOR = 2;
-    const int TOP_SECTOR = 3;
     // bottom fourth
     if (sector_y < pyramid_height/4.0) {
         // left side
@@ -88,78 +91,42 @@ vec2 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord) {
             }
         }
     }
-    return vec2(float(sector), height);
-}
 
-int get_pixel_sector(float pyramid_height, float pyramid_width, vec2 coord) {
-    float diagonal = pyramid_height/(2.0*pyramid_width);
-    float sector_x = mod(coord.x, pyramid_width);
-    float sector_y = mod(coord.y, pyramid_height);
-    float height = 0.0;
-
-    int sector;
-    const int LEFT_SECTOR = 0;
-    const int BOTTOM_SECTOR = 1;
-    const int RIGHT_SECTOR = 2;
-    const int TOP_SECTOR = 3;
-    // bottom fourth
-    if (sector_y < pyramid_height/4.0) {
-        // left side
-        if (sector_x < pyramid_width/2.0) {
-            if (sector_y < diagonal*sector_x) {
-                //height = sector_y / (pyramid_height/4.0);
-                sector = BOTTOM_SECTOR;
-            } else {
-                //height = sector_x / (pyramid_width/2.0);
-                sector = LEFT_SECTOR;
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(pyramid_width/2.0));
-            if (sector_y < (diagonal * adjusted_x * -1.0)+(pyramid_height/4.0)) {
-                //height = sector_y / (pyramid_height/4.0);
-                sector = BOTTOM_SECTOR;
-            } else {
-                //height = ((adjusted_x * -1.0)/(pyramid_width/2.0)) + 1.0;
-                sector = RIGHT_SECTOR;
-            }
-        }
-    // middle section
-    } else if ((sector_y > pyramid_height/4.0) && sector_y < 3.0*pyramid_height/4.0) {
-        if (sector_x < pyramid_width/2.0) {
-            //height = sector_x / (pyramid_width/2.0);
-            sector = LEFT_SECTOR;
-        } else {
-            //float adjusted_x = (sector_x-(pyramid_width/2.0));
-            //height = ((adjusted_x * -1.0)/(pyramid_width/2.0)) + 1.0;
-            sector = RIGHT_SECTOR;
-        }
-    // top fourth
-    } else {
-        // left side
-        if (sector_x < pyramid_width/2.0) {
-            if (sector_y > (diagonal * sector_x * -1.0) + pyramid_height) {
-                //float adjusted_y = (sector_y-(3.0*pyramid_height/4.0));
-                //height = ((adjusted_y * -1.0)/(pyramid_height/4.0)) + 1.0;
-                sector = TOP_SECTOR;
-            } else {
-                //height = sector_x / (pyramid_width/2.0);
-                sector = LEFT_SECTOR;
-            }
-        // right side
-        } else {
-            float adjusted_x = (sector_x-(pyramid_width/2.0));
-            if (sector_y > (diagonal*adjusted_x)+(3.0*pyramid_height/4.0)) {
-                //float adjusted_y = (sector_y-(3.0*pyramid_height/4.0));
-                //height = ((adjusted_y * -1.0)/(pyramid_height/4.0)) + 1.0;
-                sector = TOP_SECTOR;
-            } else {
-                //height = ((adjusted_x * -1.0)/(pyramid_width/2.0)) + 1.0;
-                sector = RIGHT_SECTOR;
-            }
-        }
+    int rotation_axis;
+    float sign_theta;
+    float axis_value;
+    if (sector == LEFT_SECTOR) {
+        rotation_axis = Z_AXIS;
+        sign_theta = 1.0;
+        axis_value = sector_x;
+    } else if (sector == BOTTOM_SECTOR) {
+        rotation_axis = X_AXIS;
+        sign_theta = -1.0;
+        axis_value = sector_y;
+    } else if (sector == RIGHT_SECTOR) {
+        rotation_axis = Z_AXIS;
+        sign_theta = -1.0;
+        axis_value = sector_x;
+    } else if (sector == TOP_SECTOR) {
+        rotation_axis = X_AXIS;
+        sign_theta = 1.0;
+        axis_value = sector_y;
     }
-    return sector;
+    float theta = sign_theta * asin((axis_value*axis_value) + (0.5*axis_value*height));
+
+    vec3 normal;
+    if (sector == LEFT_SECTOR) {
+        normal = vec3(1.0, 0.0, 0.0);
+    } else if (sector == BOTTOM_SECTOR) {
+        normal = vec3(0.0, 0.0, 1.0);
+    } else if (sector == RIGHT_SECTOR) {
+        normal = vec3(-1.0, 0.0, 0.0);
+    } else if (sector == TOP_SECTOR) {
+        normal = vec3(0.0, 0.0, -1.0);
+    }
+
+    //return vec2(float(sector), height);
+    return normal;
 }
 
 void main(void) {
@@ -221,27 +188,9 @@ void main(void) {
         float diagonal = ROW_HEIGHT/(2.0*pyramid_width);
         float height;
         int sector;
-        vec2 vector;
-        vector = get_pixel_vector(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y));
-        sector = int(vector.x);
-        height = vector.y;
+        n = get_pixel_vector(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y));
+        height = v_position.y;
 
-        const int LEFT_SECTOR = 0;
-        const int BOTTOM_SECTOR = 1;
-        const int RIGHT_SECTOR = 2;
-        const int TOP_SECTOR = 3;
-
-        if (sector == LEFT_SECTOR) {
-            color = vec3(height, 0.0, 0.0);
-        } else if (sector == BOTTOM_SECTOR) {
-            color = vec3(height, height, 0.0);
-        } else if (sector == RIGHT_SECTOR) {
-            color = vec3(0.0, 0.0, height);
-        } else if (sector == TOP_SECTOR){
-            color = vec3(0.0, height, height);
-        }
-
-        //color = vec3(coord.x, coord.y, 0.0);
         diffuse = (dot(n, l) + 1.0 ) * 0.5;
     } else {
         diffuse = (dot(n, l) + 1.0 ) * 0.5;
