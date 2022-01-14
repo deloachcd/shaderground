@@ -180,12 +180,9 @@ void main(void) {
         coord.y += 6.0919;
         coord.x /= 12.1838;
         coord.y /= 12.1838;
-        // TODO: see if I can avoid having to do this!
-        // matrix rotates coord by 180 degrees
-
         float h_offset = (mod(floor(coord.y*ROW_HEIGHT*100.0),2.0)/2.0)*COL_WIDTH;
-        int h_sector = int(abs(floor(((coord.x+h_offset)+ADJUST)/COL_WIDTH)));
-        int v_sector = int(abs(floor((coord.y+ADJUST)/ROW_HEIGHT)));
+        int h_sector = int(floor(((coord.x+h_offset)+ADJUST)/COL_WIDTH));
+        int v_sector = int(floor((coord.y+ADJUST)/ROW_HEIGHT));
 
         float pyramid_width;
         float center_shift;
