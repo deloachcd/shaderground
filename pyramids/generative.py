@@ -103,7 +103,6 @@ def main():
     # name for generated mesh
     mesh_name = "Pyramid Plane"
 
-    ## TODO subdivide the mesh here
     N_ROWS = 10
     N_COLS = 5
     ROW_HEIGHT = 1.0/N_ROWS
@@ -113,7 +112,7 @@ def main():
         # 'lower' and 'upper' y values
         ly = i * ROW_HEIGHT
         uy = ly + ROW_HEIGHT
-        if i % 2 == 1:
+        if i % 2 == 0:
             # odd row - horizontal offset makes partitioning a bit more complex
             x_offset = COL_WIDTH/2
             # draw left side half width pyramid first

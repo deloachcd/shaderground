@@ -131,6 +131,7 @@ vec3 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord, flo
         axis_value = sector_y;
     }
     height = original_height;
+    //float theta = sign_theta * asin(axis_value * sqrt((height*height) + (axis_value*axis_value)));
     float theta = sign_theta * asin((axis_value*axis_value) + (0.5*axis_value*height));
     return rotate_vector(vec3(0.0, 1.0, 0.0), theta*10.0, rotation_axis);
 
@@ -181,11 +182,6 @@ void main(void) {
         coord.y /= 12.1838;
         // TODO: see if I can avoid having to do this!
         // matrix rotates coord by 180 degrees
-        mat2 cheater = mat2(
-            -1.0, 0.0,
-             0.0, -1.0
-        );
-        coord *= cheater;
 
         float h_offset = (mod(floor(coord.y*ROW_HEIGHT*100.0),2.0)/2.0)*COL_WIDTH;
         int h_sector = int(abs(floor(((coord.x+h_offset)+ADJUST)/COL_WIDTH)));
