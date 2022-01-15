@@ -40,11 +40,11 @@ void main() {
 
     // main logic
     const float ADJUST = 0.0001;
-    const float TOLERANCE = 0.001;
+    const float TOLERANCE = 0.004;
     float COL_WIDTH = 1.0/float(N_COLS);
 
     // sector corresponds to number of rows/columns in
-    float h_offset = (mod(floor(coord.y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
+    float h_offset = (mod(floor(coord.y*MAX_LEN*100.0),2.0)/2.0)*COL_WIDTH;
     int h_sector = int(floor(((coord.x+h_offset)+ADJUST)/COL_WIDTH));
     int v_sector = int(floor((coord.y+ADJUST)/MAX_LEN));
 
@@ -53,12 +53,12 @@ void main() {
     float g = 0.0;
     float b = 0.0;
     // draw verticals
-    if (values_match((h_sector*COL_WIDTH) + h_offset,
+    if (values_match((float(h_sector)*COL_WIDTH) + h_offset,
                      coord.x, TOLERANCE)) {
         alpha = 1.0;
     }
     // draw horizontals
-    if (values_match(v_sector*MAX_LEN, coord.y, TOLERANCE)) {
+    if (values_match(float(v_sector)*MAX_LEN, coord.y, TOLERANCE)) {
         alpha = 1.0;
     }
 
@@ -69,9 +69,9 @@ void main() {
     float x_adj, y_adj;
     for (i=0; i<=N_ROWS; i++) {
         y = float(i) * MAX_LEN;
-        pt_offset = (mod(floor(y*MAX_LEN*100),2)/2.0)*COL_WIDTH;
+        pt_offset = (mod(floor(y*MAX_LEN*100.0),2.0)/2.0)*COL_WIDTH;
         for (j=0; j<=N_COLS; j++) {
-            x = (j*COL_WIDTH) + pt_offset;
+            x = (float(j)*COL_WIDTH) + pt_offset;
             x_adj = COL_WIDTH/2.0;
             y_adj = MAX_LEN/2.0;
             if (pt_offset == 0.0) {
@@ -89,14 +89,14 @@ void main() {
             }
         }
     }
-    if (int(mod(h_sector, 2.0)) == 0) {
+    if (int(mod(float(h_sector), 2.0)) == 0) {
         b += 0.5;
     }
-    if (int(mod(v_sector, 2.0)) == 0) {
+    if (int(mod(float(v_sector), 2.0)) == 0) {
         b += 0.5;
     }
     if (vectors_match(coord, corners[arr2d_index(h_sector, v_sector, N_ROWS+1)],
-                      TOLERANCE*10)) {
+                      TOLERANCE*10.0)) {
         g = 1.0;
     }
 
