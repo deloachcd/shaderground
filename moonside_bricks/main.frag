@@ -64,7 +64,7 @@ void main() {
 
     r = rand(coord);
 
-    gl_FragColor = vec4(coord.x, coord.y, 0.0, alpha);
+    gl_FragColor = vec4(coord.x, 0.0, coord.y, alpha);
     //gl_FragColor = vec4(r, g, b, alpha);
     //gl_FragColor = vec4(r, g, b, 1.0);
 }
