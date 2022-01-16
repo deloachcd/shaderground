@@ -67,15 +67,26 @@ void main() {
     float waves = 5.0;
     //vec2 anchor = vec2(mod(coord.x, 0.01), mod(coord.y, 0.01));
     //float rval = rand(anchor);
+    float x_gradient = mod(coord.x+(u_time/100.0), 2.0);
+    if (x_gradient > 1.0) {
+        x_gradient = 2.0-x_gradient;
+    }
+    float y_gradient = mod(coord.y+(u_time/150.0), 2.0);
+    if (y_gradient > 1.0) {
+        y_gradient = 2.0-y_gradient;
+    }
+    coord = vec2(x_gradient, y_gradient);
     float shifted_time =
         u_time
-        + sin(coord.x*PI*waves) 
-        + sin(coord.y*PI*waves)
+        + sin(coord.x*PI*waves*1.33) 
+        + sin(coord.y*PI*waves*2.14)
         + sin((coord.x+coord.y)*PI*waves)
-        + (distance(coord, vec2(0.0, 1.0))*2.31)
+        + distance(coord, vec2(0.0, 1.0))
         + (distance(coord, vec2(0.34, 0.84))*1.5)
-        + (distance(coord, vec2(0.76, 0.2))*3.44);
-    alpha = 0.5 + sin(coord.x*PI*waves)/4.0 + sin(coord.y*PI*waves)/4.0;
+        + (distance(coord, vec2(0.76, 0.2))*3.44)
+        + (distance(coord, vec2(1.0, 0.44))*3.44);
+    coord = vec2(coord.x/shifted_time, coord.y/shifted_time);
+    alpha = 0.85 + sin(coord.x*PI*waves)/6.0 + sin(coord.y*PI*waves)/6.0;
     float b_gradient = mod(shifted_time, 2.0);
     if (b_gradient > 1.0) {
         b_gradient = 2.0-b_gradient;
@@ -85,10 +96,10 @@ void main() {
     if (r_gradient > 2.5) {
         r_gradient = 5.0-r_gradient;
     }
-    r = r_gradient + 0.1;
-    b = (b_gradient/2.0) + 0.5;
+    r = r_gradient;
+    b = (b_gradient/2.0) + 0.25;
 
     //gl_FragColor = vec4(coord.x, 0.0, coord.y, 1.0);
-    gl_FragColor = vec4(r, 0.35672, b, alpha);
+    gl_FragColor = vec4(r/2.75, b, b, alpha);
     //gl_FragColor = vec4(r, g, b, 1.0);
 }
