@@ -64,7 +64,13 @@ void main() {
         alpha = 1.0;
     }
 
-    float waves = 5.0;
+    // simulate old-school display by 'fuzzing' our coordinate
+    float FUZZSIZE = 0.0065;
+    vec2 fuzzy_coord = vec2(coord.x - mod(coord.x, FUZZSIZE),
+                            coord.y - mod(coord.y, FUZZSIZE));
+    coord = fuzzy_coord;
+
+    // shift x and y along a gradient to scroll the pattern
     float x_gradient = mod(coord.x+(u_time/100.0), 2.0);
     if (x_gradient > 1.0) {
         x_gradient = 2.0-x_gradient;
@@ -74,6 +80,8 @@ void main() {
         y_gradient = 2.0-y_gradient;
     }
     coord = vec2(x_gradient, y_gradient);
+
+    float waves = 5.0;
     float shifted_time =
         u_time
         + sin(coord.x*PI*waves*1.33) 
