@@ -64,10 +64,6 @@ void main() {
         alpha = 1.0;
     }
 
-    float t_gradient = mod(u_time, 2.0);
-    if (t_gradient > 1.0) {
-        t_gradient = 2.0-t_gradient;
-    }
     float waves = 10.0;
     //r = 0.25 + sin(coord.x);
     //r = sin(distance(coord.x, 0.5)*PI*waves)
@@ -75,14 +71,18 @@ void main() {
     //r = 0.5 + sin(coord.x*PI*waves)/4.0 + sin(coord.y*PI*waves)/4.0;
     alpha = 0.5 + sin(coord.x*PI*waves)/4.0 + sin(coord.y*PI*waves)/4.0;
     //float t_chop = mod(u_time, 100.0);
+    float shifted_time = u_time + (coord.x * 5.0);
+    float b_gradient = mod(u_time, 2.0);
+    if (b_gradient > 1.0) {
+        b_gradient = 2.0-b_gradient;
+    }
     float r_shift = PI/2.0;
     float r_gradient = mod(u_time + r_shift, 5.0);
     if (r_gradient > 2.5) {
         r_gradient = 5.0-r_gradient;
     }
-    float rushed = t_gradient * 100.0;
     r = r_gradient + 0.1;
-    b = (t_gradient/2.0) + 0.5;
+    b = (b_gradient/2.0) + 0.5;
 
     //gl_FragColor = vec4(coord.x, 0.0, coord.y, 1.0);
     gl_FragColor = vec4(r, 0.35672, b, alpha);
