@@ -65,8 +65,6 @@ void main() {
     }
 
     float waves = 5.0;
-    //vec2 anchor = vec2(mod(coord.x, 0.01), mod(coord.y, 0.01));
-    //float rval = rand(anchor);
     float x_gradient = mod(coord.x+(u_time/100.0), 2.0);
     if (x_gradient > 1.0) {
         x_gradient = 2.0-x_gradient;
