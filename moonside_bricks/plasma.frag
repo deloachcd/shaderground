@@ -64,20 +64,24 @@ void main() {
         alpha = 1.0;
     }
 
-    float waves = 10.0;
-    //r = 0.25 + sin(coord.x);
-    //r = sin(distance(coord.x, 0.5)*PI*waves)
-    //    + sin(distance(coord.y, 0.5)*PI*waves);
-    //r = 0.5 + sin(coord.x*PI*waves)/4.0 + sin(coord.y*PI*waves)/4.0;
+    float waves = 5.0;
+    //vec2 anchor = vec2(mod(coord.x, 0.01), mod(coord.y, 0.01));
+    //float rval = rand(anchor);
+    float shifted_time =
+        u_time
+        + sin(coord.x*PI*waves) 
+        + sin(coord.y*PI*waves)
+        + sin((coord.x+coord.y)*PI*waves)
+        + (distance(coord, vec2(0.0, 1.0))*2.31)
+        + (distance(coord, vec2(0.34, 0.84))*1.5)
+        + (distance(coord, vec2(0.76, 0.2))*3.44);
     alpha = 0.5 + sin(coord.x*PI*waves)/4.0 + sin(coord.y*PI*waves)/4.0;
-    //float t_chop = mod(u_time, 100.0);
-    float shifted_time = u_time + (coord.x * 5.0);
-    float b_gradient = mod(u_time, 2.0);
+    float b_gradient = mod(shifted_time, 2.0);
     if (b_gradient > 1.0) {
         b_gradient = 2.0-b_gradient;
     }
     float r_shift = PI/2.0;
-    float r_gradient = mod(u_time + r_shift, 5.0);
+    float r_gradient = mod(shifted_time + r_shift, 5.0);
     if (r_gradient > 2.5) {
         r_gradient = 5.0-r_gradient;
     }
