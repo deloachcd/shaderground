@@ -81,7 +81,9 @@ void main() {
     }
     coord = vec2(x_gradient, y_gradient);
 
-    float waves = 5.0;
+    float waves = 6.66;
+    // I do all this crazy stuff to u_time because it controls where
+    // on a smooth color gradient our current location falls
     float shifted_time =
         u_time
         + sin(coord.x*PI*waves*1.33) 
@@ -91,12 +93,19 @@ void main() {
         + (distance(coord, vec2(0.34, 0.84))*1.5)
         + (distance(coord, vec2(0.76, 0.2))*3.44)
         + (distance(coord, vec2(1.0, 0.44))*3.44);
+
+    // I can't actually remember why I did this, but it looks better
     coord = vec2(coord.x/shifted_time, coord.y/shifted_time);
+
+    // again, this just looks better for some reason
     alpha = 0.85 + sin(coord.x*PI*waves)/6.0 + sin(coord.y*PI*waves)/6.0;
+
+    // blue gradient should be looped through in 2 seconds...
     float b_gradient = mod(shifted_time, 2.0);
     if (b_gradient > 1.0) {
         b_gradient = 2.0-b_gradient;
     }
+    // ...while the red gradient takes 5 
     float r_shift = PI/2.0;
     float r_gradient = mod(shifted_time + r_shift, 5.0);
     if (r_gradient > 2.5) {
@@ -105,7 +114,9 @@ void main() {
     r = r_gradient;
     b = (b_gradient/2.0) + 0.25;
 
-    //gl_FragColor = vec4(coord.x, 0.0, coord.y, 1.0);
+    // I write the blue gradient to the green channel because
+    // I like the palette it generates, easiest way to tweak
+    // the palette is messing with what gets written to the
+    // RGB channels
     gl_FragColor = vec4(r/2.75, b, b, alpha);
-    //gl_FragColor = vec4(r, g, b, 1.0);
 }
