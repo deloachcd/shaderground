@@ -6,6 +6,7 @@ uniform vec3  u_light;
 uniform vec2  u_resolution;
 uniform float u_time;
 uniform vec4  u_date;
+uniform sampler2D bg_texture;
 
 varying vec4 v_position;
 
@@ -209,8 +210,10 @@ void main(void) {
         diffuse = (dot(n, l) + 1.0 ) * 0.5;
     }
     color *= diffuse;
-#endif
-#endif
+#endif  // ifdef MODEL_VERTEX_NORMAL
+#else
+    color = texture2D(bg_texture, 0.5*vec2(v_position.x, mod(v_position.y+u_time/16.0, 2.0))).xyz;
+#endif  // ifndef BACKGROUND
 
     gl_FragColor = vec4(color, 1.0);
 }

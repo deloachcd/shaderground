@@ -5,7 +5,7 @@ import bmesh
 import mathutils
 import os
 
-h = 0.01
+h = 0.005
 verts = [
     (0.0, 1.0, 0.0),
     (0.0, 0.0, 0.0),

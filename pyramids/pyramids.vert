@@ -83,20 +83,15 @@ void main(void) {
                             float(v_sector)*ROW_HEIGHT + ROW_HEIGHT/2.0);
         float sector_x = mod(coord.x, COL_WIDTH);
         float sector_y = mod(coord.y, ROW_HEIGHT);
-        float height = 0.0;
-        float shifted_time = rand(anchor) * u_time;
+        float shifted_time = rand(anchor) * u_time * 1.2;
         float t_seed = mod(shifted_time, 2.0);
         if (t_seed > 1.0) {
             t_seed = 2.0-t_seed;
         }
+        const float min_height = 0.25;
+        const float max_height = 1.0;
         if (!(mod(coord.y, ROW_HEIGHT) < 0.01)) {
-            height = 1.0;
-        }
-        if (distance(coord, vec2(coord.x, 0.0)) > 0.01 &&
-                distance(coord, vec2(coord.x, 1.0)) > 0.01 &&
-                distance(coord, vec2(0.0, coord.y)) > 0.01 &&
-                distance(coord, vec2(1.0, coord.y)) > 0.01) {
-            v_position.y += t_seed * height;
+            v_position.y += min_height + (max_height-min_height)*t_seed;
         }
     }
 #endif

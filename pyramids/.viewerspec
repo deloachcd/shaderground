@@ -1,1 +1,1 @@
-meshes/generated_plane.obj pyramids.frag pyramids.vert
+meshes/generated_plane.obj pyramids.frag pyramids.vert -bg_texture assets/sky_texture.jpg
