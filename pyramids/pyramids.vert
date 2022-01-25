@@ -88,10 +88,10 @@ void main(void) {
         if (t_seed > 1.0) {
             t_seed = 2.0-t_seed;
         }
-        const float min_height = 0.25;
-        const float max_height = 1.0;
+        const float MIN_HEIGHT = 0.25;
+        const float MAX_HEIGHT = 1.0;
         if (!(mod(coord.y, ROW_HEIGHT) < 0.01)) {
-            v_position.y += min_height + (max_height-min_height)*t_seed;
+            v_position.y += MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT)*t_seed;
         }
     }
 #endif

@@ -134,7 +134,7 @@ vec3 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord, flo
     height = original_height;
     //float theta = sign_theta * asin(axis_value * sqrt((height*height) + (axis_value*axis_value)));
     float theta = sign_theta * asin((axis_value*axis_value) + (0.5*axis_value*height));
-    return rotate_vector(vec3(0.0, 1.0, 0.0), theta*10.0, rotation_axis);
+    return rotate_vector(vec3(0.0, 1.0, 0.0), theta*13.0, rotation_axis);
 
     vec3 normal;
     if (sector == LEFT_SECTOR) {
@@ -153,6 +153,7 @@ vec3 get_pixel_vector(float pyramid_height, float pyramid_width, vec2 coord, flo
 
 void main(void) {
     vec3 color = vec3(0.0);
+    float alpha = 1.0;
 
 #ifdef MODEL_VERTEX_NORMAL
     vec3 n = normalize(v_normal);
@@ -213,7 +214,10 @@ void main(void) {
 #endif  // ifdef MODEL_VERTEX_NORMAL
 #else
     color = texture2D(bg_texture, 0.5*vec2(v_position.x, mod(v_position.y+u_time/16.0, 2.0))).xyz;
+    // dampen alpha around the edges of the window (John's idea)
+    alpha = 0.75/distance(v_position.xy, vec2(0.25,0.25));
+
 #endif  // ifndef BACKGROUND
 
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, alpha);
 }
