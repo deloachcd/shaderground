@@ -205,18 +205,17 @@ void main(void) {
         int sector;
         n = get_pixel_vector(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y), v_position.y);
         height = v_position.y;
+        //color = vec3(1.0, 0.0, 0.0);
 
-        diffuse = (dot(n, l) + 1.0 ) * 0.5;
+        diffuse = (dot(n, l) + 1.0 ) * 0.55;
     } else {
-        diffuse = (dot(n, l) + 1.0 ) * 0.5;
+        diffuse = (dot(n, l) + 1.0 ) * 0.55;
     }
     color *= diffuse;
 #endif  // ifdef MODEL_VERTEX_NORMAL
 #else
-    color = texture2D(bg_texture, 0.5*vec2(v_position.x, mod(v_position.y+u_time/16.0, 2.0))).xyz;
-    // dampen alpha around the edges of the window (John's idea)
-    alpha = 0.75/distance(v_position.xy, vec2(0.25,0.25));
-
+    color = texture2D(bg_texture, 0.5*vec2(v_position.x, mod(v_position.y+u_time/30.0, 2.0))).xyz;
+    color *= clamp(1.0/distance(v_position.xy, vec2(0.0,0.0)), 0.0, 1.2);
 #endif  // ifndef BACKGROUND
 
     gl_FragColor = vec4(color, alpha);
