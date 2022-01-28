@@ -205,7 +205,6 @@ void main(void) {
         int sector;
         n = get_pixel_vector(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y), v_position.y);
         height = v_position.y;
-        //color = vec3(1.0, 0.0, 0.0);
 
         diffuse = (dot(n, l) + 1.0 ) * 0.55;
     } else {
