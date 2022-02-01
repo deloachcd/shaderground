@@ -6,15 +6,23 @@ uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec4 u_date;
 
-
-float rand(vec2 co) {
-    // generate a random value based on the seconds in the day that have
-    // passed when loading the shader
-    return fract(sin(dot(co, vec2(12.9898, 78.233))) * (u_date.z * 3674.2));
-}
-
 bool values_match(float v1, float v2, float tolerance) {
     return v1 < v2 + tolerance && v1 > v2 - tolerance;
+}
+
+float spike_gradient(float iterable, float max_value) {
+    // returns gradient from 0 -> max_value
+    float max_x2 = max_value * 2.0;
+    float gradient_value = mod(iterable, max_x2);
+    if (gradient_value > max_value) {
+        gradient_value = max_x2 - gradient_value;
+    }
+    return gradient_value;
+}
+
+float sawtooth_gradient(float iterable, float max_value) {
+    // returns gradient from 0 -> max_value
+    return mod(iterable, max_value);
 }
 
 void main() {
@@ -28,16 +36,20 @@ void main() {
 
     // main logic
     const float ADJUST = 0.0001;
-    const float TOLERANCE = 0.001;
+    const float TOLERANCE = 0.025;
     float COL_WIDTH = 1.0/float(N_COLS);
     float horizontal_offset = mod(u_time, 1.0);
-    float r = 0.0;
-    if (values_match((floor((coord.x+ADJUST)/COL_WIDTH)*COL_WIDTH) + horizontal_offset,
-                     coord.x, TOLERANCE)) {
-        r = 1.0;
+    float color = 0.0;
+
+    float scroll_gradient = sawtooth_gradient(u_time, 0.2);
+    float mode_gradient = sawtooth_gradient(u_time, 2.0);
+    bool render_vertical = mode_gradient > 1.0;
+    if (mode_gradient > 1.0 && mod(coord.y-scroll_gradient, COL_WIDTH) <= TOLERANCE) {
+        color = 1.0;
+    }
+    if (mode_gradient < 1.0 && mod(coord.x-scroll_gradient, COL_WIDTH) <= TOLERANCE) {
+        color = 1.0;
     }
 
-    //float r = rand(coord);
-
-    gl_FragColor = vec4(r, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(color, color, color, 1.0);
 }
