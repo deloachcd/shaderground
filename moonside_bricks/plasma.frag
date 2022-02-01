@@ -65,7 +65,7 @@ void main() {
     }
 
     // simulate old-school display by 'fuzzing' our coordinate
-    float FUZZSIZE = 0.0065;
+    float FUZZSIZE = 0.005;
     vec2 fuzzy_coord = vec2(coord.x - mod(coord.x, FUZZSIZE),
                             coord.y - mod(coord.y, FUZZSIZE));
     coord = fuzzy_coord;
