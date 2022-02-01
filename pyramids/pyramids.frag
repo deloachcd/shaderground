@@ -205,7 +205,6 @@ void main(void) {
         int sector;
         n = get_pixel_vector(ROW_HEIGHT, pyramid_width, vec2(coord.x+h_offset, coord.y), v_position.y);
         height = v_position.y;
-        //color = vec3(1.0, 0.0, 0.0);
 
         diffuse = (dot(n, l) + 1.0 ) * 0.55;
     } else {
@@ -215,6 +214,9 @@ void main(void) {
 #endif  // ifdef MODEL_VERTEX_NORMAL
 #else
     color = texture2D(bg_texture, 0.5*vec2(v_position.x, mod(v_position.y+u_time/30.0, 2.0))).xyz;
+    // Dampening the background's color around the edges was John's suggestion,
+    // doing it through the alpha channel caused some strange behavior so
+    // I do it through this clamped vector multiplication instead.
     color *= clamp(1.0/distance(v_position.xy, vec2(0.0,0.0)), 0.0, 1.2);
 #endif  // ifndef BACKGROUND
 
