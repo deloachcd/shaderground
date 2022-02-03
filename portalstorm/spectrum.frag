@@ -3,6 +3,7 @@ precision mediump float;
 #endif
 
 uniform vec2 u_resolution;
+uniform vec4 u_date;
 uniform float u_time;
 
 float spike_gradient(float iterable, float min_value, float max_value) {
@@ -30,6 +31,7 @@ void main() {
     float r_min = 103.0/255.0;
     float g_min = 216.0/255.0;
     float b_min = 244.0/255.0;
+    vec3 initial_color = vec3(r_min, g_min, b_min);
     vec3 color = vec3(r_min, g_min, b_min);
 
     float t_sawtooth = sawtooth_gradient(u_time/2.0, 0.0, 1.2);
@@ -39,7 +41,7 @@ void main() {
     //
     // e.x. starfield, second reality tunnel dots
     float c_dist = distance(coord, vec2(0.5, 0.5));
-    float colorshift = 1.0 - (3.9 * square(spike_gradient(c_dist, 0.0, 152.0/255.0)));
+    float colorshift = 1.0 - (5.0 * square(spike_gradient(c_dist, 0.0, 152.0/255.0)));
     color.x = clamp(color.x+colorshift, r_min, 1.0);
     color.y = clamp(color.y+colorshift, g_min, 1.0);
     color.z = clamp(color.z+colorshift, b_min, 1.0);
