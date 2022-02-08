@@ -19,7 +19,6 @@ float spike_gradient(float iterable, float min_value, float max_value) {
 float sawtooth_gradient(float iterable, float min_value, float max_value) {
     float gradient_value = mod(iterable, max_value-min_value);
     return min_value + gradient_value;
-
 }
 
 float square(float value) {
