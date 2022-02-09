@@ -52,16 +52,23 @@ bool pixel_in_VCB(vec2 coord, vec2 a, vec2 b, vec2 c, vec2 d,
     return false;
 }
 
-bool pixel_in_ellipse_border(vec2 coord, vec2 center_pt, float width, float height,
-                             float thickness) {
-    float xh_2 = (coord.x - center_pt.x) * (coord.x - center_pt.y);
+float get_ellipse_y(float x, vec2 center, float width, float height, int _sign) {
+    float xh = x - center.x;
+    float xh_2 = xh * xh;
     float w_2 = width * width;
     float h_2 = height * height;
+    return center.y + (float(_sign) * sqrt(h_2*(1.0 - (xh_2/w_2))));
+}
+
+bool pixel_in_ellipse_radius(vec2 coord, vec2 center_pt, float width, float height,
+                             float thickness) {
     bool pixel_in_upper_hemisphere = (
-        distance(coord.y, center_pt.y + sqrt(h_2*(1.0 - (xh_2/w_2)))) < thickness
+        distance(coord.y,
+                 get_ellipse_y(coord.x, center_pt, width, height, 1)) < thickness
     );
     bool pixel_in_lower_hemisphere = (
-        distance(coord.y, center_pt.y - sqrt(h_2*(1.0 - (xh_2/w_2)))) < thickness  
+        distance(coord.y,
+                 get_ellipse_y(coord.x, center_pt, width, height, -1)) < thickness  
     );
     return pixel_in_upper_hemisphere || pixel_in_lower_hemisphere;
 }
@@ -105,13 +112,31 @@ void main() {
     vec2 joints[4];
     vec3 color = vec3(0.0);
 
-    float g = spike_gradient(u_time/10.0, 0.0, 0.2);
+    float c_shift = spike_gradient(u_time/10.0, 0.0, 0.2);
     float t = sawtooth_gradient(u_time/2.0, 0.0, 2.0);
+
+    vec2 o_orbital_center = vec2(0.5, 0.6);
+    float oo_width = 0.3;
+    float oo_height = 0.01;
+
+    float o_orbital_g = sawtooth_gradient(u_time/10.0, 0.0, oo_width);
+    float o_orbital_x = o_orbital_center.x + o_orbital_g;
+    vec2 o_orbital_joint;
+    o_orbital_joint = vec2(o_orbital_x,
+                           get_ellipse_y(o_orbital_x, o_orbital_center,
+                                         oo_width, oo_height, +1));
+                                                                           
     // defined in reverse order just for visual consistency
     joints[3] = vec2(0.5, 0.8);
-    joints[2] = vec2(0.4+g, 0.6);
+    joints[2] = o_orbital_joint;
     joints[1] = vec2(0.5, 0.5);
     joints[0] = vec2(0.5, 0.2);
+
+    //float get_ellipse_y(float x, vec2 center, float width, float height, int _sign) {
+    if (pixel_in_ellipse_radius(coord, o_orbital_center,
+                                oo_width, oo_height, TOLERANCE/5.0)) {
+        color = vec3(0.0, 0.3, 1.0);
+    }
 
     if (pixel_in_line(coord, joints[0], joints[1], TOLERANCE/5.0)) {
         color = vec3(1.0, 0.0, 0.0);
@@ -122,8 +147,10 @@ void main() {
     if (pixel_in_line(coord, joints[2], joints[3], TOLERANCE/5.0)) {
         color = vec3(1.0, 0.0, 0.0);
     }
-    if (pixel_in_ellipse_border(coord, vec2(0.5, 0.6), 0.2, 0.01, TOLERANCE/5.0)) {
-        color = vec3(0.0, 0.3, 1.0);
+    for (int i=0; i < 4; i++) {
+        if (distance(coord, joints[i]) < TOLERANCE) {
+            color = vec3(0.0, 1.0, 0.0);
+        }
     }
 
     if (t < 1.0) {
