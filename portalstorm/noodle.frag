@@ -52,23 +52,23 @@ bool pixel_in_VCB(vec2 coord, vec2 a, vec2 b, vec2 c, vec2 d,
     return false;
 }
 
-float get_ellipse_y(float x, vec2 center, float width, float height, int _sign) {
+float get_ellipse_y(float x, vec2 center, float width, float height, float _sign) {
     float xh = x - center.x;
     float xh_2 = xh * xh;
     float w_2 = width * width;
     float h_2 = height * height;
-    return center.y + (float(_sign) * sqrt(h_2*(1.0 - (xh_2/w_2))));
+    return center.y + (_sign * sqrt(h_2*(1.0 - (xh_2/w_2))));
 }
 
 bool pixel_in_ellipse_radius(vec2 coord, vec2 center_pt, float width, float height,
                              float thickness) {
     bool pixel_in_upper_hemisphere = (
         distance(coord.y,
-                 get_ellipse_y(coord.x, center_pt, width, height, 1)) < thickness
+                 get_ellipse_y(coord.x, center_pt, width, height, 1.0)) < thickness
     );
     bool pixel_in_lower_hemisphere = (
         distance(coord.y,
-                 get_ellipse_y(coord.x, center_pt, width, height, -1)) < thickness  
+                 get_ellipse_y(coord.x, center_pt, width, height, -1.0)) < thickness  
     );
     return pixel_in_upper_hemisphere || pixel_in_lower_hemisphere;
 }
@@ -132,26 +132,25 @@ void main() {
     float c_shift = spike_gradient(u_time/10.0, 0.0, 0.2);
     float t = sawtooth_gradient(u_time/2.0, 0.0, 2.0);
 
-    vec2 o_orbital_center = vec2(0.5, 0.6);
+    // "OO" -> "o orbital", big orbital (o as in o soto gari = big outside reap)
+    vec2 oo_center = vec2(0.5, 0.6);
     float oo_width = 0.3;
     float oo_height = 0.01;
 
-    float o_orbital_g = sawtooth_gradient(u_time/10.0, 0.0, oo_width);
-    float o_orbital_x = o_orbital_center.x + o_orbital_g;
-    vec2 o_orbital_joint;
-    o_orbital_joint = vec2(o_orbital_x,
-                           get_ellipse_y(o_orbital_x, o_orbital_center,
-                                         oo_width, oo_height, +1));
+    vec2 oo_g = orbital_gradient(u_time/10.0, oo_width);
+    float oo_x = oo_center.x + oo_g.x;
+    vec2 oo_joint;
+    oo_joint = vec2(oo_x, get_ellipse_y(oo_x, oo_center,
+                                        oo_width, oo_height, oo_g.y));
                                                                            
     // defined in reverse order just for visual consistency
     joints[3] = vec2(0.5, 0.8);
-    joints[2] = o_orbital_joint;
+    joints[2] = oo_joint;
     joints[1] = vec2(0.5, 0.5);
     joints[0] = vec2(0.5, 0.2);
 
-    //float get_ellipse_y(float x, vec2 center, float width, float height, int _sign) {
-    if (pixel_in_ellipse_radius(coord, o_orbital_center,
-                                oo_width, oo_height, TOLERANCE/5.0)) {
+    if (pixel_in_ellipse_radius(coord, oo_center, oo_width, oo_height,
+                                TOLERANCE/5.0)) {
         color = vec3(0.0, 0.3, 1.0);
     }
 
