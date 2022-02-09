@@ -6,7 +6,8 @@ uniform vec2 u_resolution;
 uniform vec4 u_date;
 uniform float u_time;
 
-bool pixel_in_bezier_quad_2d(vec2 coord, vec2 a, vec2 b, vec2 c, float t, float tolerance) {
+bool pixel_in_bezier_quad_2d(vec2 coord, vec2 a, vec2 b, vec2 c, float t,
+                             float tolerance) {
     /* Formula:
        P = A(1-t)^2 + 2Bt(1-t) + Ct^2
        t represents 'progress' from point A to C
@@ -40,8 +41,10 @@ bool pixel_in_VCB(vec2 coord, vec2 a, vec2 b, vec2 c, vec2 d,
         float t_2 = t * t;
         float t_3 = t_2 * t;
 
-        // apply the formula for cubic bezier curves to determine if coord is within {tolerance} distance
-        if (distance(coord.x, (a.x*ti_3) + (3.0*b.x*t*ti_2) + (3.0*c.x*t_2*ti) + (d.x*t_3)) < tolerance) {
+        // apply the formula for cubic bezier curves to determine if pixel coord
+        // is within render distance
+        float curve_pt = (a.x*ti_3) + (3.0*b.x*t*ti_2) + (3.0*c.x*t_2*ti) + (d.x*t_3);
+        if (distance(coord.x, curve_pt) < tolerance) {
             return true;
         }
     }
@@ -49,12 +52,17 @@ bool pixel_in_VCB(vec2 coord, vec2 a, vec2 b, vec2 c, vec2 d,
     return false;
 }
 
-bool pixel_in_ellipse_border(vec2 coord, vec2 center_pt, float width, float height, float thickness) {
+bool pixel_in_ellipse_border(vec2 coord, vec2 center_pt, float width, float height,
+                             float thickness) {
     float xh_2 = (coord.x - center_pt.x) * (coord.x - center_pt.y);
     float w_2 = width * width;
     float h_2 = height * height;
-    bool pixel_in_upper_hemisphere = distance(coord.y, center_pt.y + sqrt(h_2*(1.0 - (xh_2/w_2)))) < thickness;
-    bool pixel_in_lower_hemisphere = distance(coord.y, center_pt.y - sqrt(h_2*(1.0 - (xh_2/w_2)))) < thickness;
+    bool pixel_in_upper_hemisphere = (
+        distance(coord.y, center_pt.y + sqrt(h_2*(1.0 - (xh_2/w_2)))) < thickness
+    );
+    bool pixel_in_lower_hemisphere = (
+        distance(coord.y, center_pt.y - sqrt(h_2*(1.0 - (xh_2/w_2)))) < thickness  
+    );
     return pixel_in_upper_hemisphere || pixel_in_lower_hemisphere;
 }
 
@@ -119,12 +127,14 @@ void main() {
     }
 
     if (t < 1.0) {
-        if (pixel_in_VCB(coord, joints[0], joints[1], joints[2], joints[3], t, 1.0, TOLERANCE)) {
+        if (pixel_in_VCB(coord, joints[0], joints[1], joints[2],
+                         joints[3], t, 1.0, TOLERANCE)) {
             color = vec3(1.0, 1.0, 1.0);
         }
     } else {
         t = t - 1.0;
-        if (pixel_in_VCB(coord, joints[0], joints[1], joints[2], joints[3], 0.0, t, TOLERANCE)) {
+        if (pixel_in_VCB(coord, joints[0], joints[1], joints[2],
+                         joints[3], 0.0, t, TOLERANCE)) {
             color = vec3(1.0, 1.0, 1.0);
         }
     }
