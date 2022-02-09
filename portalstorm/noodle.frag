@@ -122,8 +122,8 @@ void main() {
     if (pixel_in_line(coord, joints[2], joints[3], TOLERANCE/5.0)) {
         color = vec3(1.0, 0.0, 0.0);
     }
-    if (pixel_in_ellipse_border(coord, vec2(0.5, 0.5), 0.2, 0.1, TOLERANCE)) {
-        color = vec3(1.0, 1.0, 1.0);
+    if (pixel_in_ellipse_border(coord, vec2(0.5, 0.6), 0.2, 0.01, TOLERANCE/5.0)) {
+        color = vec3(0.0, 0.3, 1.0);
     }
 
     if (t < 1.0) {
