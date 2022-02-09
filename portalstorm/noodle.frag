@@ -12,6 +12,7 @@ bool pixel_in_bezier_quad_2d(vec2 coord, vec2 a, vec2 b, vec2 c, float t, float 
        t represents 'progress' from point A to C
      */
 
+    // TODO Implement this in a program where it will actually be useful
     return false;
 }
 
@@ -48,6 +49,15 @@ bool pixel_in_VCB(vec2 coord, vec2 a, vec2 b, vec2 c, vec2 d,
     return false;
 }
 
+bool pixel_in_ellipse_border(vec2 coord, vec2 center_pt, float width, float height, float thickness) {
+    float xh_2 = (coord.x - center_pt.x) * (coord.x - center_pt.y);
+    float w_2 = width * width;
+    float h_2 = height * height;
+    bool pixel_in_upper_hemisphere = distance(coord.y, center_pt.y + sqrt(h_2*(1.0 - (xh_2/w_2)))) < thickness;
+    bool pixel_in_lower_hemisphere = distance(coord.y, center_pt.y - sqrt(h_2*(1.0 - (xh_2/w_2)))) < thickness;
+    return pixel_in_upper_hemisphere || pixel_in_lower_hemisphere;
+}
+
 float sawtooth_gradient(float iterable, float min_value, float max_value) {
     float gradient_value = mod(iterable, max_value-min_value);
     return min_value + gradient_value;
@@ -82,27 +92,30 @@ bool pixel_in_line(vec2 coord, vec2 pt1, vec2 pt2, float thickness) {
 void main() {
     vec2 coord = gl_FragCoord.xy/u_resolution;
     const int N_JOINTS = 5;
-    const float TOLERANCE = 0.010;
+    const float TOLERANCE = 0.005;
     float joint_sector_h = 1.0/float(N_JOINTS);
     vec2 joints[4];
     vec3 color = vec3(0.0);
 
-    float g = spike_gradient(u_time/2.0, 0.0, 0.2);
+    float g = spike_gradient(u_time/10.0, 0.0, 0.2);
     float t = sawtooth_gradient(u_time/2.0, 0.0, 2.0);
     // defined in reverse order just for visual consistency
-    joints[3] = vec2(0.6-g, 0.8);
+    joints[3] = vec2(0.5, 0.8);
     joints[2] = vec2(0.4+g, 0.6);
-    joints[1] = vec2(0.6-g, 0.4);
-    joints[0] = vec2(0.4+g, 0.2);
+    joints[1] = vec2(0.5, 0.5);
+    joints[0] = vec2(0.5, 0.2);
 
-    if (pixel_in_line(coord, joints[0], joints[1], TOLERANCE)) {
+    if (pixel_in_line(coord, joints[0], joints[1], TOLERANCE/5.0)) {
         color = vec3(1.0, 0.0, 0.0);
     }
-    if (pixel_in_line(coord, joints[1], joints[2], TOLERANCE)) {
-        color = vec3(0.0, 0.5, 1.0);
+    if (pixel_in_line(coord, joints[1], joints[2], TOLERANCE/5.0)) {
+        color = vec3(1.0, 0.0, 0.0);
     }
-    if (pixel_in_line(coord, joints[2], joints[3], TOLERANCE)) {
-        color = vec3(0.0, 1.0, 0.0);
+    if (pixel_in_line(coord, joints[2], joints[3], TOLERANCE/5.0)) {
+        color = vec3(1.0, 0.0, 0.0);
+    }
+    if (pixel_in_ellipse_border(coord, vec2(0.5, 0.5), 0.2, 0.1, TOLERANCE)) {
+        color = vec3(1.0, 1.0, 1.0);
     }
 
     if (t < 1.0) {
