@@ -88,6 +88,23 @@ float spike_gradient(float iterable, float min_value, float max_value) {
     return gradient_value;
 }
 
+vec2 orbital_gradient(float iterable, float width) {
+    float half_value_range = width * 2.0;
+    float value_range = half_value_range * 2.0;
+    float gradient_value = mod(iterable, value_range);
+    vec2 gradient_vector;
+    if (gradient_value <= width) {
+        gradient_vector = vec2(gradient_value, 1.0);
+    } else if (gradient_value <= 2.0*width) {
+        gradient_vector = vec2(width-mod(gradient_value, width), -1.0);
+    } else if (gradient_value <= 3.0*width) {
+        gradient_vector = vec2(-mod(gradient_value, width), -1.0);
+    } else {
+        gradient_vector = vec2(-1.0*(width-mod(gradient_value, width)), 1.0);
+    }
+    return gradient_vector;
+}
+
 float get_slope(vec2 lower_pt, vec2 higher_pt) {
     return (higher_pt.y - lower_pt.y) / (higher_pt.x - lower_pt.x);
 }
