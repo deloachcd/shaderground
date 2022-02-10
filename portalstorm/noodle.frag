@@ -137,19 +137,34 @@ void main() {
     float oo_width = 0.3;
     float oo_height = 0.01;
 
-    vec2 oo_g = orbital_gradient(u_time/10.0, oo_width);
-    float oo_x = oo_center.x + oo_g.x;
+    vec2 oo_grad = orbital_gradient(u_time/100.0, oo_width);
+    float oo_x = oo_center.x + oo_grad.x;
     vec2 oo_joint;
     oo_joint = vec2(oo_x, get_ellipse_y(oo_x, oo_center,
-                                        oo_width, oo_height, oo_g.y));
+                                        oo_width, oo_height, oo_grad.y));
+
+    // "KOO" -> "ko orbital", small orbital (ko as in ko uchi gari = small inside reap)
+    vec2 koo_center = vec2(0.5, 0.83);
+    float koo_width = 0.03;
+    float koo_height = 0.015;
+
+    vec2 koo_grad = orbital_gradient(u_time/1000.0, koo_width);
+    float koo_x = koo_center.x + koo_grad.x;
+    vec2 koo_joint;
+    koo_joint = vec2(koo_x, get_ellipse_y(koo_x, koo_center,
+                                          koo_width, koo_height, koo_grad.y));
                                                                            
     // defined in reverse order just for visual consistency
-    joints[3] = vec2(0.5, 0.8);
+    joints[3] = koo_joint;
     joints[2] = oo_joint;
     joints[1] = vec2(0.5, 0.5);
     joints[0] = vec2(0.5, 0.2);
 
     if (pixel_in_ellipse_radius(coord, oo_center, oo_width, oo_height,
+                                TOLERANCE/5.0)) {
+        color = vec3(0.0, 0.3, 1.0);
+    }
+    if (pixel_in_ellipse_radius(coord, koo_center, koo_width, koo_height,
                                 TOLERANCE/5.0)) {
         color = vec3(0.0, 0.3, 1.0);
     }
@@ -169,18 +184,18 @@ void main() {
         }
     }
 
-    if (t < 1.0) {
+    //if (t < 1.0) {
         if (pixel_in_VCB(coord, joints[0], joints[1], joints[2],
-                         joints[3], t, 1.0, TOLERANCE)) {
+                         joints[3], 0.0, 1.0, TOLERANCE)) {
             color = vec3(1.0, 1.0, 1.0);
         }
-    } else {
-        t = t - 1.0;
-        if (pixel_in_VCB(coord, joints[0], joints[1], joints[2],
-                         joints[3], 0.0, t, TOLERANCE)) {
-            color = vec3(1.0, 1.0, 1.0);
-        }
-    }
+    //} else {
+    //    t = t - 1.0;
+    //    if (pixel_in_VCB(coord, joints[0], joints[1], joints[2],
+    //                     joints[3], 0.0, t, TOLERANCE)) {
+    //        color = vec3(1.0, 1.0, 1.0);
+    //    }
+    //}
 
     gl_FragColor = vec4(color, 1.0);
 }
