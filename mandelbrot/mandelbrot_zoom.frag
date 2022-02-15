@@ -22,28 +22,31 @@ vec2 mandelbrot_fn(vec2 z) {
 
 void main() {
     vec2 coord = gl_FragCoord.xy/u_resolution;
-    coord -= vec2(1.4, 0.4);
+    //float zoom = cos(spike_gradient(u_time/10.0, 1.5, 2.5)) * (1.0 + (u_time/1000.0));
+    //float shift = mod(u_time/3.0, 2.5)/9.0;
+    //float zoom = 2.5 - mod(u_time/3.0, 2.5);
+    float zoom = 1.0 / (10000.0*spike_gradient(u_time/20.0, 0.0, 1.0));
+    //float zoom = 1.0 / 10000.0;
+    const float MAX_ITER = 200.0;
 
-    float zoom = cos(spike_gradient(u_time/10.0, 1.5, 2.5)) * (1.0 + (u_time/1000.0));
-    coord /= zoom;
-    const float MAX_ITER = 100.0;
-
-    vec2 z = coord;
-    float iterations = 0.0;
-    while (iterations < MAX_ITER && length(z) < 2.0) {
+    // see the entire shape
+    vec2 shift = vec2(0.8, 0.49);
+    vec2 center_c = (coord - shift) * 2.5;
+    //vec2 c = (coord - shift) * zoom; // visible
+    vec2 center = vec2(-.65, 0.45);
+    vec2 c = center + (coord*zoom);
+    float iterations;
+    vec2 z = c;
+    for (iterations = 0.0; iterations < MAX_ITER && length(z) < 2.0; iterations++) {
         // apply mandelbrot function
-        z = mandelbrot_fn(z) + coord;
-        iterations += 1.0;
+        z = mandelbrot_fn(z) + c;
     }
     float f = iterations/MAX_ITER;
-    vec3 color;
-    if (iterations <= 256.0) {
-        color = vec3(iterations/256.0, 0.0, 0.0);
-    } else if (iterations > 256.0 && iterations <= 512.0) {
-        color = vec3(256.0, mod(iterations,256.0), 0.0);
-    } else {
-        color = vec3(256.0, 256.0, mod(iterations,256.0));
+
+    float g = 0.0;
+    if (distance(c, shift) < 0.1) {
+        g = 1.0;
     }
 
-    gl_FragColor = vec4(z.x, 0.0, z.y, 1.0);
+    gl_FragColor = vec4(z.x, g, z.y, 1.0);
 }
