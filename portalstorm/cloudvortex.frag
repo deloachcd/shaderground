@@ -2,8 +2,20 @@
 precision mediump float;
 #endif
 
+#define PI 3.1415926535897932384626433832795
+
 uniform vec2 u_resolution;
 uniform float u_time;
+
+mat2 rotation2d(float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+
+    return mat2(
+        c, -s,
+        s, c
+    );
+}
 
 float get_ellipse_y(float x, vec2 center, float width, float height, float _sign) {
     float xh = x - center.x;
@@ -75,8 +87,14 @@ float fbm (in vec2 st) {
 void main() {
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
     float t = u_time/1000.0;
-    //st.x *= u_resolution.x/u_resolution.y;
+    const float threshold = 0.999;
+    float theta;
+    float t_shift = mod(u_time, 360.0);
+    const float THETA_MAX = 60.0;
 
+    theta = THETA_MAX * (1.0 - distance(st, vec2(0.5, 0.5)));
+    float rad = PI/180.0;
+    st = rotation2d((theta+t_shift) * rad) * st;
     // v1 -> e1 - single iteration of fbm, OCTAVES times
     vec2 v1 = vec2(0.0);
     v1.x = fbm(st*3.0);
